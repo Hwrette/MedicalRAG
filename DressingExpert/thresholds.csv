@@ -1,0 +1,15 @@
+channel,level,min,max
+co2,low,0,400
+co2,medium,400,1000
+co2,high,1000,5000
+ph,low,0,6.5
+ph,medium,6.5,7.5
+ph,high,7.5,14
+temperature,low,0,15
+temperature,medium,15,30
+temperature,high,30,40
+humidity,low,0,30
+humidity,medium,30,60
+humidity,high,60,100
+
+
