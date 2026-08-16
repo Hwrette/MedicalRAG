@@ -9,6 +9,6 @@ with open(f"{base_dir}/rules.csv", "r", newline="", encoding="utf-8") as csv_fil
     rules_data = [row for row in reader]
 
 
-with open(f"{base_dir}/data.json", "w", encoding="utf-8") as json_file:
+with open(f"{base_dir}/rules.json", "w", encoding="utf-8") as json_file:
     json.dump(rules_data, json_file, indent=4, ensure_ascii=False)
         

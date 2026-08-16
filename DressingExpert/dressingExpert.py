@@ -7,6 +7,7 @@ with open(f"{base_dir}/thresholds.csv", "r", newline="", encoding="utf-8") as cs
     thresholds_data = [row for row in reader]
 
     thresholds_dict = {}
+
     for row in thresholds_data:
         ch = row["channel"]
         lvl = row["level"]
@@ -16,11 +17,25 @@ with open(f"{base_dir}/thresholds.csv", "r", newline="", encoding="utf-8") as cs
             thresholds_dict[ch] = {}
         thresholds_dict[ch][lvl] = {"min": lo, "max": hi}
 
-print(thresholds_dict)
+# print(thresholds_dict)
 
 
-def thresholds(channel):
-    if channel not in channels:
-        raise ValueError(f"Channel '{channel}' not found in thresholds data.")
+def get_level(channel, value):
+    if channel not in thresholds_dict:
+        return None
+    for level, limits in thresholds_dict[channel].items():
+        if limits["min"] <= value < limits["max"]:
+            return level
+    return None      # 어느 구간에도 안 걸림 = 이상치
+    
+facts = {}
 
-
+with open(f"{base_dir}/data.json", "r", encoding="utf-8") as json_file:
+    facts = json.load(json_file)
+    for channel, value in facts.items():
+        level = get_level(channel, value)
+        if level is not None:
+            facts[channel] = level
+        else:
+            facts[channel] = "abnormal"  # 이상치 처리
+    print(facts)
