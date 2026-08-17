@@ -1,0 +1,50 @@
+[
+    {
+        "id": "R03",
+        "condition": "ph_level=high",
+        "conclusion": "check_needed",
+        "action": "recheck_tomorrow",
+        "cf": "0.15",
+        "note": "단일 채널 약한 근거"
+    },
+    {
+        "id": "R06",
+        "condition": "temp_level=low",
+        "conclusion": "check_needed",
+        "action": "recheck_tomorrow",
+        "cf": "0.20",
+        "note": ""
+    },
+    {
+        "id": "R07",
+        "condition": "temp_level=high",
+        "conclusion": "check_needed",
+        "action": "recheck_12h",
+        "cf": "0.35",
+        "note": ""
+    },
+    {
+        "id": "R09",
+        "condition": "co2_level=high",
+        "conclusion": "check_needed",
+        "action": "recheck_tomorrow",
+        "cf": "0.30",
+        "note": ""
+    },
+    {
+        "id": "R12",
+        "condition": "ph_level=high AND co2_level=high",
+        "conclusion": "check_needed",
+        "action": "seek_care_consider",
+        "cf": "0.45",
+        "note": "채널 겹침 (CO2-pH 독립성 확인 필요)"
+    },
+    {
+        "id": "R20",
+        "condition": "humidity_level=medium",
+        "conclusion": "change_needed",
+        "action": "change_dressing",
+        "cf": "0.50",
+        "note": " "
+    }
+]
