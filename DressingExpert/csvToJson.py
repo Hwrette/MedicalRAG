@@ -4,7 +4,7 @@ import csv
 import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-with open(f"{base_dir}/rules.csv", "r", newline="", encoding="utf-8") as csv_file:
+with open(f"{base_dir}/demo_rules.csv", "r", newline="", encoding="utf-8") as csv_file:
     reader = csv.DictReader(csv_file)
     rules_data = [row for row in reader]
 
