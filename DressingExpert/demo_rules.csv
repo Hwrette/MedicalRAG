@@ -1,7 +1,7 @@
 id,condition,conclusion,action,cf,note
-R03,ph_level=high,check_needed,recheck_tomorrow,0.15,단일 채널 약한 근거
-R06,temp_level=low,check_needed,recheck_tomorrow,0.20,
-R07,temp_level=high,check_needed,recheck_12h,0.35,
-R09,co2_level=high,check_needed,recheck_tomorrow,0.30,
-R12,ph_level=high AND co2_level=high,check_needed,seek_care_consider,0.45,채널 겹침 (CO2-pH 독립성 확인 필요)
-R20,humidity_level=medium,change_needed,change_dressing,0.50, 
+R03,ph=high,check_needed,recheck_tomorrow,0.15,단일 채널 약한 근거
+R06,temperature=low,check_needed,recheck_tomorrow,0.20,
+R07,temperature=high,check_needed,recheck_12h,0.35,
+R09,co2=high,check_needed,recheck_tomorrow,0.30,
+R12,ph=high AND co2=high,check_needed,seek_care_consider,0.45,채널 겹침 (CO2-pH 독립성 확인 필요)
+R20,humidity=medium,change_needed,change_dressing,0.50, 
