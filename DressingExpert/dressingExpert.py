@@ -1,93 +1,71 @@
+"""센서 데이터 로딩 → 등급 변환 → 추론 → 행동 설명 연결."""
+
 import csv
 import json
-base_dir = __file__.rsplit("/", 1)[0]
+import math
+from pathlib import Path
 
-# 임계값 딕셔너리 저장
-with open(f"{base_dir}/thresholds.csv", "r", newline="", encoding="utf-8") as csv_file:
-    reader = csv.DictReader(csv_file)
-    thresholds_data = [row for row in reader]
+if __package__:
+    from .inference import infer
+else:
+    from inference import infer
 
-    thresholds_dict = {}
-
-    for row in thresholds_data:
-        ch = row["channel"]
-        lvl = row["level"]
-        lo = float(row["min"])
-        hi = float(row["max"])
-        if ch not in thresholds_dict:
-            thresholds_dict[ch] = {}
-        thresholds_dict[ch][lvl] = {"min": lo, "max": hi}
-
-# print(thresholds_dict)
+BASE_DIR = Path(__file__).resolve().parent
 
 
-def get_level(channel, value):
-    if channel not in thresholds_dict:
-        return None
-    for level, limits in thresholds_dict[channel].items():
+def load_json(path):
+    with Path(path).open(encoding="utf-8-sig") as file:
+        return json.load(file)
+
+
+def load_thresholds(path):
+    thresholds = {}
+    with Path(path).open(newline="", encoding="utf-8-sig") as file:
+        for row in csv.DictReader(file):
+            thresholds.setdefault(row["channel"], {})[row["level"]] = {
+                "min": float(row["min"]), "max": float(row["max"])
+            }
+    return thresholds
+
+
+def get_level(channel, value, thresholds):
+    """하한 포함·상한 제외 구간. 미입력은 unknown, 범위 밖은 abnormal."""
+    if value is None or value == "unknown":
+        return "unknown"
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+        raise ValueError(f"{channel}: 유한한 센서 숫자가 필요합니다: {value!r}")
+    if channel not in thresholds:
+        raise ValueError(f"임계값이 없는 센서입니다: {channel}")
+    for level, limits in thresholds[channel].items():
         if limits["min"] <= value < limits["max"]:
             return level
-    return None      # 어느 구간에도 안 걸림 = 이상치
-    
+    return "abnormal"
 
 
-# 임계값에 따라 팩트에 채널별 레벨 부여
-with open(f"{base_dir}/data.json", "r", encoding="utf-8") as json_file:
-    raw = json.load(json_file)
+def build_facts(raw, thresholds):
+    return {channel: get_level(channel, value, thresholds) for channel, value in raw.items()}
 
-facts = {}
-facts["conc"] = []  # 결론을 담을 리스트 초기화
 
-for channel, value in raw.items():
-    level = get_level(channel, value)
-    facts[channel] = level if level is not None else "abnormal"
+def load_actions(path):
+    with Path(path).open(newline="", encoding="utf-8-sig") as file:
+        return {
+            row["action"]: {"action": row["action"], "severity": int(row["severity"]), "text": row["text"]}
+            for row in csv.DictReader(file)
+        }
 
-print(facts)
 
-with open(f"{base_dir}/rules.json", "r", encoding="utf-8") as json_file:
-    rules_data = json.load(json_file)
-    for rule in rules_data:
+def run(data_path=None, rules_path=None, thresholds_path=None, actions_path=None):
+    thresholds = load_thresholds(thresholds_path or BASE_DIR / "thresholds.csv")
+    facts = build_facts(load_json(data_path or BASE_DIR / "data.json"), thresholds)
+    result = infer(facts, load_json(rules_path or BASE_DIR / "rules.json"))
+    action_catalog = load_actions(actions_path or BASE_DIR / "actions.csv")
+    # 모든 후보를 보존한다. severity는 CSV에 정의된 표시 순서에만 사용한다.
+    result["action_details"] = sorted(
+        [action_catalog[action] for action in result["actions"]],
+        key=lambda item: item["severity"], reverse=True,
+    )
+    return result
 
-        print(f"Evaluating rule: {rule['id']} with condition: {rule['condition']}")
-        condition = rule["condition"]
 
-        # AND 파싱
-        if "AND" in condition:
-            ALL_satisfied = True
-            sub_conditions = condition.split("AND")
-            for rules in range(len(sub_conditions)):
-                sub_conditions[rules] = sub_conditions[rules].strip()
-                current_sub_condition = sub_conditions[rules]
-                # AND 파싱 후 = 파싱
-                if "=" in current_sub_condition:
-                    parsed_current_sub_condition = current_sub_condition.split("=")
-                    channel = parsed_current_sub_condition[0].strip()
-                    expected_value = parsed_current_sub_condition[1].strip()
-                    if channel in facts and facts[channel] == expected_value:
-                        print(f"Sub-condition {current_sub_condition} is satisfied.")
-                        ALL_satisfied = True
-                    else:
-                        ALL_satisfied = False
-                        break  # 하나라도 만족하지 않으면 AND 조건 전체가 만족하지 않음
-
-                        
-            if ALL_satisfied and rule["conclusion"] not in facts["conc"]:
-                facts["conc"].append(rule["conclusion"])
-
-                
-        # AND 없는 경우 = 파싱
-        elif "=" in condition:
-            parsed_condition = condition.split("=")
-            channel = parsed_condition[0].strip()
-            expected_value = parsed_condition[1].strip()
-            if channel in facts and facts[channel] == expected_value:
-                print(f"Condition {condition} is satisfied.")
-                if rule["conclusion"] not in facts["conc"]:
-                    facts["conc"].append(rule["conclusion"])
-                continue 
-            
-            # print(f"Evaluating rule: {rule['id']} with sub-conditions: {sub_conditions}")
-            
-        # print(f"Evaluating rule: {rule['id']} with condition: {condition}")
-
-print(facts)
+if __name__ == "__main__":
+    print(json.dumps(run(), indent=2, ensure_ascii=False))
