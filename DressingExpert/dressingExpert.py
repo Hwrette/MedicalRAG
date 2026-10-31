@@ -1,48 +1,72 @@
+"""센서 데이터 로딩 → 등급 변환 → 추론 → 행동 설명 연결."""
+
 import csv
 import json
-base_dir = __file__.rsplit("/", 1)[0]
+import math
+from pathlib import Path
 
-# 임계값 딕셔너리 저장
-with open(f"{base_dir}/thresholds.csv", "r", newline="", encoding="utf-8") as csv_file:
-    reader = csv.DictReader(csv_file)
-    thresholds_data = [row for row in reader]
+if __package__:
+    from .inference import infer
+else:
+    from inference import infer
 
-    thresholds_dict = {}
-
-    for row in thresholds_data:
-        ch = row["channel"]
-        lvl = row["level"]
-        lo = float(row["min"])
-        hi = float(row["max"])
-        if ch not in thresholds_dict:
-            thresholds_dict[ch] = {}
-        thresholds_dict[ch][lvl] = {"min": lo, "max": hi}
-
-# print(thresholds_dict)
+BASE_DIR = Path(__file__).resolve().parent
+FILES_DIR = BASE_DIR / "files"
 
 
-def get_level(channel, value):
-    if channel not in thresholds_dict:
-        return None
-    for level, limits in thresholds_dict[channel].items():
+def load_json(path):
+    with Path(path).open(encoding="utf-8-sig") as file:
+        return json.load(file)
+
+
+def load_thresholds(path):
+    thresholds = {}
+    with Path(path).open(newline="", encoding="utf-8-sig") as file:
+        for row in csv.DictReader(file):
+            thresholds.setdefault(row["channel"], {})[row["level"]] = {
+                "min": float(row["min"]), "max": float(row["max"])
+            }
+    return thresholds
+
+
+def get_level(channel, value, thresholds):
+    """하한 포함·상한 제외 구간. 미입력은 unknown, 범위 밖은 abnormal."""
+    if value is None or value == "unknown":
+        return "unknown"
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+        raise ValueError(f"{channel}: 유한한 센서 숫자가 필요합니다: {value!r}")
+    if channel not in thresholds:
+        raise ValueError(f"임계값이 없는 센서입니다: {channel}")
+    for level, limits in thresholds[channel].items():
         if limits["min"] <= value < limits["max"]:
             return level
-    return None      # 어느 구간에도 안 걸림 = 이상치
-    
-facts = {}
+    return "abnormal"
 
-# 임계값에 따라 팩트에 채널별 레벨 부여
-with open(f"{base_dir}/data.json", "r", encoding="utf-8") as json_file:
-    facts = json.load(json_file)
-    for channel, value in facts.items():
-        level = get_level(channel, value)
-        if level is not None:
-            facts[channel] = level
-        else:
-            facts[channel] = "abnormal"  # 이상치 처리
-    print(facts)
 
-with open(f"{base_dir}/rules.json", "r", encoding="utf-8") as json_file:
-    rules_data = json.load(json_file)
-    for rule in rules_data:
-        print(f"Rule ID: {rule['id']}, Condition: {rule['condition']}, Conclusion: {rule['conclusion']}, Action: {rule['action']}, CF: {rule['cf']}, Note: {rule['note']}")
+def build_facts(raw, thresholds):
+    return {channel: get_level(channel, value, thresholds) for channel, value in raw.items()}
+
+
+def load_actions(path):
+    with Path(path).open(newline="", encoding="utf-8-sig") as file:
+        return {
+            row["action"]: {"action": row["action"], "severity": int(row["severity"]), "text": row["text"]}
+            for row in csv.DictReader(file)
+        }
+
+
+def run(data_path=None, rules_path=None, thresholds_path=None, actions_path=None):
+    thresholds = load_thresholds(thresholds_path or FILES_DIR / "thresholds.csv")
+    facts = build_facts(load_json(data_path or FILES_DIR / "data.json"), thresholds)
+    result = infer(facts, load_json(rules_path or FILES_DIR / "rules.json"))
+    action_catalog = load_actions(actions_path or FILES_DIR / "actions.csv")
+    # 모든 후보를 보존한다. severity는 CSV에 정의된 표시 순서에만 사용한다.
+    result["action_details"] = sorted(
+        [action_catalog[action] for action in result["actions"]],
+        key=lambda item: item["severity"], reverse=True,
+    )
+    return result
+
+
+if __name__ == "__main__":
+    print(json.dumps(run(), indent=2, ensure_ascii=False))

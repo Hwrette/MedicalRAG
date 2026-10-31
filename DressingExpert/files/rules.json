@@ -1,7 +1,7 @@
 [
     {
         "id": "R03",
-        "condition": "ph_level=high",
+        "condition": "ph=high",
         "conclusion": "check_needed",
         "action": "recheck_tomorrow",
         "cf": "0.15",
@@ -9,7 +9,7 @@
     },
     {
         "id": "R06",
-        "condition": "temp_level=low",
+        "condition": "temperature=low",
         "conclusion": "check_needed",
         "action": "recheck_tomorrow",
         "cf": "0.20",
@@ -17,7 +17,7 @@
     },
     {
         "id": "R07",
-        "condition": "temp_level=high",
+        "condition": "temperature=high",
         "conclusion": "check_needed",
         "action": "recheck_12h",
         "cf": "0.35",
@@ -25,7 +25,7 @@
     },
     {
         "id": "R09",
-        "condition": "co2_level=high",
+        "condition": "co2=high",
         "conclusion": "check_needed",
         "action": "recheck_tomorrow",
         "cf": "0.30",
@@ -33,7 +33,7 @@
     },
     {
         "id": "R12",
-        "condition": "ph_level=high AND co2_level=high",
+        "condition": "ph=high AND co2=high",
         "conclusion": "check_needed",
         "action": "seek_care_consider",
         "cf": "0.45",
@@ -41,7 +41,7 @@
     },
     {
         "id": "R20",
-        "condition": "humidity_level=medium",
+        "condition": "humidity=medium",
         "conclusion": "change_needed",
         "action": "change_dressing",
         "cf": "0.50",
