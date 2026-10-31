@@ -11,6 +11,7 @@ else:
     from inference import infer
 
 BASE_DIR = Path(__file__).resolve().parent
+FILES_DIR = BASE_DIR / "files"
 
 
 def load_json(path):
@@ -55,10 +56,10 @@ def load_actions(path):
 
 
 def run(data_path=None, rules_path=None, thresholds_path=None, actions_path=None):
-    thresholds = load_thresholds(thresholds_path or BASE_DIR / "thresholds.csv")
-    facts = build_facts(load_json(data_path or BASE_DIR / "data.json"), thresholds)
-    result = infer(facts, load_json(rules_path or BASE_DIR / "rules.json"))
-    action_catalog = load_actions(actions_path or BASE_DIR / "actions.csv")
+    thresholds = load_thresholds(thresholds_path or FILES_DIR / "thresholds.csv")
+    facts = build_facts(load_json(data_path or FILES_DIR / "data.json"), thresholds)
+    result = infer(facts, load_json(rules_path or FILES_DIR / "rules.json"))
+    action_catalog = load_actions(actions_path or FILES_DIR / "actions.csv")
     # 모든 후보를 보존한다. severity는 CSV에 정의된 표시 순서에만 사용한다.
     result["action_details"] = sorted(
         [action_catalog[action] for action in result["actions"]],
