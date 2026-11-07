@@ -1,0 +1,20 @@
+{
+  "note": "사용자 제공 사진 방향·구도 전용 수동 ROI. 왼쪽 온도, 오른쪽 위 페놀레드, 아래 BTB. 회전·이동된 사진은 ROI를 다시 지정해야 함. 보정표는 패치별 실험 데이터로 채워야 함.",
+  "patches": {
+    "temperature": {
+      "roi": [0.30, 0.325, 0.35, 0.365],
+      "calibration": [],
+      "max_rgb_distance": null
+    },
+    "phenol_red": {
+      "roi": [0.47, 0.29, 0.58, 0.40],
+      "calibration": [],
+      "max_rgb_distance": null
+    },
+    "btb": {
+      "roi": [0.44, 0.535, 0.55, 0.64],
+      "calibration": [],
+      "max_rgb_distance": null
+    }
+  }
+}

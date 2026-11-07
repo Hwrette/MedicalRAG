@@ -203,4 +203,6 @@ def measure_and_match_indicators_detailed():
 
 
 if __name__ == "__main__":
-  measure_and_match_indicators_detailed()
+  # --image로 지정한 사진을 패치별로 분석하여 전문가 시스템까지 실행한다.
+  from DressingExpert.dressingExpert import main
+  main()

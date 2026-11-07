@@ -1,6 +1,8 @@
 {
-    "humidity" : 45,
-    "co2" : 20,
-    "temperature" : 13.5,
-    "ph" : 13
+  "ph_value": 6.8,
+  "temperature_value": 37.2,
+  "phenol_red_ph_value": 7.5,
+  "day_since_start": 1,
+  "day_since_change": 1,
+  "dressing_change_event": false
 }
