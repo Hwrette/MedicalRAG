@@ -1,1018 +1,1034 @@
 [
-    {
-        "id": "R01",
-        "phase": "classification",
-        "condition": "ph_valid and (ph_value < 6)",
-        "conclusion": "ph_level=normal",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R02",
-        "phase": "classification",
-        "condition": "ph_valid and (6 <= ph_value < 6.5)",
-        "conclusion": "ph_level=observation",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R03",
-        "phase": "classification",
-        "condition": "ph_valid and (6.5 <= ph_value < 7)",
-        "conclusion": "ph_level=caution",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R04",
-        "phase": "classification",
-        "condition": "ph_valid and (7 <= ph_value < 8)",
-        "conclusion": "ph_level=infection_risk",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R05",
-        "phase": "classification",
-        "condition": "ph_valid and (ph_value >= 8)",
-        "conclusion": "ph_level=high_risk",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R06",
-        "phase": "classification",
-        "condition": "temperature_valid and (temperature_value <= 36.5)",
-        "conclusion": "temperature_level=normal",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R07",
-        "phase": "classification",
-        "condition": "temperature_valid and (36.5 < temperature_value < 37)",
-        "conclusion": "temperature_level=observation",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R08",
-        "phase": "classification",
-        "condition": "temperature_valid and (37 <= temperature_value < 37.5)",
-        "conclusion": "temperature_level=caution",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R09",
-        "phase": "classification",
-        "condition": "temperature_valid and (37.5 <= temperature_value < 38)",
-        "conclusion": "temperature_level=infection_risk",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R10",
-        "phase": "classification",
-        "condition": "temperature_valid and (temperature_value >= 38)",
-        "conclusion": "temperature_level=high_risk",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R11",
-        "phase": "classification",
-        "condition": "phenol_red_valid and (phenol_red_ph_value >= 8)",
-        "conclusion": "phenol_red_level=normal",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R12",
-        "phase": "classification",
-        "condition": "phenol_red_valid and (7 <= phenol_red_ph_value < 8)",
-        "conclusion": "phenol_red_level=observation",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R13",
-        "phase": "classification",
-        "condition": "phenol_red_valid and (6.5 <= phenol_red_ph_value < 7)",
-        "conclusion": "phenol_red_level=caution",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R14",
-        "phase": "classification",
-        "condition": "phenol_red_valid and (6 <= phenol_red_ph_value < 6.5)",
-        "conclusion": "phenol_red_level=infection_risk",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R15",
-        "phase": "classification",
-        "condition": "phenol_red_valid and (phenol_red_ph_value < 6)",
-        "conclusion": "phenol_red_level=high_risk",
-        "group": "levels",
-        "action": ""
-    },
-    {
-        "id": "R16",
-        "phase": "validation",
-        "condition": "not ph_valid",
-        "conclusion": "ph_input_invalid",
-        "group": "validation",
-        "action": ""
-    },
-    {
-        "id": "R17",
-        "phase": "validation",
-        "condition": "not temperature_valid",
-        "conclusion": "temperature_input_invalid",
-        "group": "validation",
-        "action": ""
-    },
-    {
-        "id": "R18",
-        "phase": "validation",
-        "condition": "not phenol_red_valid",
-        "conclusion": "phenol_red_input_invalid",
-        "group": "validation",
-        "action": ""
-    },
-    {
-        "id": "R19",
-        "phase": "validation",
-        "condition": "ph_valid and temperature_valid and phenol_red_valid",
-        "conclusion": "measurement_set_valid",
-        "group": "validation",
-        "action": ""
-    },
-    {
-        "id": "R20",
-        "phase": "validation",
-        "condition": "not ph_valid or not temperature_valid or not phenol_red_valid",
-        "conclusion": "insufficient_evidence",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R21",
-        "phase": "individual",
-        "condition": "ph_level == \"observation\"",
-        "conclusion": "ph_observation_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R22",
-        "phase": "individual",
-        "condition": "ph_level == \"caution\"",
-        "conclusion": "ph_warning_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R23",
-        "phase": "individual",
-        "condition": "ph_level == \"infection_risk\"",
-        "conclusion": "ph_severe_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R24",
-        "phase": "individual",
-        "condition": "ph_level == \"high_risk\"",
-        "conclusion": "ph_high_risk_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R25",
-        "phase": "individual",
-        "condition": "temperature_level == \"observation\"",
-        "conclusion": "temperature_observation_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R26",
-        "phase": "individual",
-        "condition": "temperature_level == \"caution\"",
-        "conclusion": "temperature_warning_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R27",
-        "phase": "individual",
-        "condition": "temperature_level == \"infection_risk\"",
-        "conclusion": "temperature_severe_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R28",
-        "phase": "individual",
-        "condition": "temperature_level == \"high_risk\"",
-        "conclusion": "temperature_high_risk_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R29",
-        "phase": "individual",
-        "condition": "phenol_red_level == \"observation\"",
-        "conclusion": "phenol_red_observation_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R30",
-        "phase": "individual",
-        "condition": "phenol_red_level == \"caution\"",
-        "conclusion": "phenol_red_warning_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R31",
-        "phase": "individual",
-        "condition": "phenol_red_level == \"infection_risk\"",
-        "conclusion": "phenol_red_severe_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R32",
-        "phase": "individual",
-        "condition": "phenol_red_level == \"high_risk\"",
-        "conclusion": "phenol_red_high_risk_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R33",
-        "phase": "individual",
-        "condition": "ph_rank >= 2",
-        "conclusion": "ph_risk_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R34",
-        "phase": "individual",
-        "condition": "temperature_rank >= 2",
-        "conclusion": "temperature_risk_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R35",
-        "phase": "individual",
-        "condition": "phenol_red_rank >= 2",
-        "conclusion": "phenol_red_risk_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R36",
-        "phase": "individual",
-        "condition": "ph_rank >= 3",
-        "conclusion": "ph_advanced_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R37",
-        "phase": "individual",
-        "condition": "temperature_rank >= 3",
-        "conclusion": "temperature_advanced_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R38",
-        "phase": "individual",
-        "condition": "phenol_red_rank >= 3",
-        "conclusion": "phenol_red_advanced_signal",
-        "group": "individual_signals",
-        "action": ""
-    },
-    {
-        "id": "R39",
-        "phase": "combined",
-        "condition": "risk_count == 1 and ph_risk_signal",
-        "conclusion": "isolated_primary_signal",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R40",
-        "phase": "combined",
-        "condition": "risk_count == 1 and temperature_risk_signal",
-        "conclusion": "isolated_temperature_signal",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R41",
-        "phase": "combined",
-        "condition": "risk_count == 1 and phenol_red_risk_signal",
-        "conclusion": "isolated_phenol_red_signal",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R42",
-        "phase": "combined",
-        "condition": "risk_count == 2 and ph_risk_signal and temperature_risk_signal",
-        "conclusion": "primary_temperature_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R43",
-        "phase": "combined",
-        "condition": "risk_count == 2 and ph_risk_signal and phenol_red_risk_signal",
-        "conclusion": "primary_phenol_red_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R44",
-        "phase": "combined",
-        "condition": "risk_count == 2 and temperature_risk_signal and phenol_red_risk_signal",
-        "conclusion": "secondary_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R45",
-        "phase": "combined",
-        "condition": "risk_count == 3",
-        "conclusion": "three_indicator_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R46",
-        "phase": "combined",
-        "condition": "advanced_count >= 2",
-        "conclusion": "multiple_advanced_signals",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R47",
-        "phase": "combined",
-        "condition": "primary_temperature_combination and ((ph_rank >= 3 and temperature_rank == 2) or (temperature_rank >= 3 and ph_rank == 2))",
-        "conclusion": "strong_primary_temperature_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R48",
-        "phase": "combined",
-        "condition": "primary_temperature_combination and ph_rank >= 3 and temperature_rank >= 3",
-        "conclusion": "very_strong_primary_temperature_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R49",
-        "phase": "combined",
-        "condition": "primary_phenol_red_combination and ((ph_rank >= 3 and phenol_red_rank == 2) or (phenol_red_rank >= 3 and ph_rank == 2))",
-        "conclusion": "strong_primary_phenol_red_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R50",
-        "phase": "combined",
-        "condition": "primary_phenol_red_combination and ph_rank >= 3 and phenol_red_rank >= 3",
-        "conclusion": "very_strong_primary_phenol_red_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R51",
-        "phase": "combined",
-        "condition": "secondary_combination and ((temperature_rank >= 3 and phenol_red_rank == 2) or (phenol_red_rank >= 3 and temperature_rank == 2))",
-        "conclusion": "strong_secondary_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R52",
-        "phase": "combined",
-        "condition": "secondary_combination and temperature_rank >= 3 and phenol_red_rank >= 3",
-        "conclusion": "very_strong_secondary_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R53",
-        "phase": "combined",
-        "condition": "risk_count == 3 and advanced_count == 1",
-        "conclusion": "strong_three_indicator_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R54",
-        "phase": "combined",
-        "condition": "risk_count == 3 and advanced_count >= 2",
-        "conclusion": "very_strong_three_indicator_combination",
-        "group": "combined_signals",
-        "action": ""
-    },
-    {
-        "id": "R55",
-        "phase": "trend",
-        "condition": "not ph_comparable",
-        "conclusion": "ph_trend=unknown",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R56",
-        "phase": "trend",
-        "condition": "ph_comparable and ph_delta == 1",
-        "conclusion": "ph_trend=weakly_rising",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R57",
-        "phase": "trend",
-        "condition": "ph_comparable and ph_delta >= 2",
-        "conclusion": "ph_trend=strongly_rising",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R58",
-        "phase": "trend",
-        "condition": "ph_comparable and ph_delta == -1",
-        "conclusion": "ph_trend=weakly_falling",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R59",
-        "phase": "trend",
-        "condition": "ph_comparable and ph_delta <= -2",
-        "conclusion": "ph_trend=strongly_falling",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R60",
-        "phase": "trend",
-        "condition": "ph_comparable and ph_delta == 0",
-        "conclusion": "ph_trend=stable",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R61",
-        "phase": "trend",
-        "condition": "not temperature_comparable",
-        "conclusion": "temperature_trend=unknown",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R62",
-        "phase": "trend",
-        "condition": "temperature_comparable and temperature_delta == 1",
-        "conclusion": "temperature_trend=weakly_rising",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R63",
-        "phase": "trend",
-        "condition": "temperature_comparable and temperature_delta >= 2",
-        "conclusion": "temperature_trend=strongly_rising",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R64",
-        "phase": "trend",
-        "condition": "temperature_comparable and temperature_delta == -1",
-        "conclusion": "temperature_trend=weakly_falling",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R65",
-        "phase": "trend",
-        "condition": "temperature_comparable and temperature_delta <= -2",
-        "conclusion": "temperature_trend=strongly_falling",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R66",
-        "phase": "trend",
-        "condition": "temperature_comparable and temperature_delta == 0",
-        "conclusion": "temperature_trend=stable",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R67",
-        "phase": "trend",
-        "condition": "not phenol_red_comparable",
-        "conclusion": "phenol_red_trend=unknown",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R68",
-        "phase": "trend",
-        "condition": "phenol_red_comparable and phenol_red_delta == 1",
-        "conclusion": "phenol_red_trend=weakly_worsening",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R69",
-        "phase": "trend",
-        "condition": "phenol_red_comparable and phenol_red_delta >= 2",
-        "conclusion": "phenol_red_trend=strongly_worsening",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R70",
-        "phase": "trend",
-        "condition": "phenol_red_comparable and phenol_red_delta == -1",
-        "conclusion": "phenol_red_trend=weakly_improving",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R71",
-        "phase": "trend",
-        "condition": "phenol_red_comparable and phenol_red_delta <= -2",
-        "conclusion": "phenol_red_trend=strongly_improving",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R72",
-        "phase": "trend",
-        "condition": "phenol_red_comparable and phenol_red_delta == 0",
-        "conclusion": "phenol_red_trend=stable",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R73",
-        "phase": "trend",
-        "condition": "ph_comparable and ph_delta > 0",
-        "conclusion": "ph_worsening_trend",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R74",
-        "phase": "trend",
-        "condition": "temperature_comparable and temperature_delta > 0",
-        "conclusion": "temperature_worsening_trend",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R75",
-        "phase": "trend",
-        "condition": "phenol_red_comparable and phenol_red_delta > 0",
-        "conclusion": "phenol_red_worsening_trend",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R76",
-        "phase": "trend",
-        "condition": "worsening_count >= 2 and strong_worsening_count == 0",
-        "conclusion": "weak_multi_indicator_worsening",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R77",
-        "phase": "trend",
-        "condition": "worsening_count >= 2 and strong_worsening_count >= 1",
-        "conclusion": "strong_multi_indicator_worsening",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R78",
-        "phase": "trend",
-        "condition": "weak_multi_indicator_worsening or strong_multi_indicator_worsening",
-        "conclusion": "worsening_over_time",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R79",
-        "phase": "trend",
-        "condition": "ph_comparable and temperature_comparable and ph_delta < 0 and temperature_delta < 0 and not phenol_red_worsening_trend",
-        "conclusion": "improving_over_time",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R80",
-        "phase": "trend",
-        "condition": "ph_comparable and phenol_red_comparable and ph_delta < 0 and phenol_red_delta < 0 and not temperature_worsening_trend",
-        "conclusion": "improving_over_time",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R81",
-        "phase": "trend",
-        "condition": "temperature_comparable and phenol_red_comparable and temperature_delta < 0 and phenol_red_delta < 0 and not ph_worsening_trend",
-        "conclusion": "improving_over_time",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R82",
-        "phase": "trend",
-        "condition": "worsening_count >= 1 and improving_count >= 1",
-        "conclusion": "discordant_change_pattern",
-        "group": "trend_results",
-        "action": ""
-    },
-    {
-        "id": "R83",
-        "phase": "persistence",
-        "condition": "ph_risk_run >= 2",
-        "conclusion": "ph_repeated_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R84",
-        "phase": "persistence",
-        "condition": "ph_risk_run >= 3",
-        "conclusion": "ph_persistent_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R85",
-        "phase": "persistence",
-        "condition": "temperature_risk_run >= 2",
-        "conclusion": "temperature_repeated_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R86",
-        "phase": "persistence",
-        "condition": "temperature_risk_run >= 3",
-        "conclusion": "temperature_persistent_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R87",
-        "phase": "persistence",
-        "condition": "phenol_red_risk_run >= 2",
-        "conclusion": "phenol_red_repeated_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R88",
-        "phase": "persistence",
-        "condition": "phenol_red_risk_run >= 3",
-        "conclusion": "phenol_red_persistent_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R89",
-        "phase": "persistence",
-        "condition": "ph_repeated_warning or temperature_repeated_warning or phenol_red_repeated_warning",
-        "conclusion": "repeated_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R90",
-        "phase": "persistence",
-        "condition": "ph_persistent_warning or temperature_persistent_warning or phenol_red_persistent_warning",
-        "conclusion": "persistent_warning",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R91",
-        "phase": "persistence",
-        "condition": "changed_count > 0",
-        "conclusion": "new_change_detected",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R92",
-        "phase": "persistence",
-        "condition": "all_stable_three",
-        "conclusion": "stable_over_time",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R93",
-        "phase": "persistence",
-        "condition": "dressing_change_event and changed_count > 0",
-        "conclusion": "post_dressing_change_change",
-        "group": "persistence_results",
-        "action": ""
-    },
-    {
-        "id": "R94",
-        "phase": "conclusion",
-        "condition": "normal_count == 3",
-        "conclusion": "no_warning_signal_detected",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R95",
-        "phase": "conclusion",
-        "condition": "risk_count == 0 and observation_count > 0",
-        "conclusion": "observation_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R96",
-        "phase": "conclusion",
-        "condition": "risk_count == 1",
-        "conclusion": "isolated_signal_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R97",
-        "phase": "conclusion",
-        "condition": "risk_count == 1 and high_count == 1",
-        "conclusion": "isolated_high_risk_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R98",
-        "phase": "conclusion",
-        "condition": "risk_count >= 2",
-        "conclusion": "combined_signal_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R99",
-        "phase": "conclusion",
-        "condition": "strong_primary_temperature_combination or strong_primary_phenol_red_combination or strong_three_indicator_combination",
-        "conclusion": "strong_combined_signal_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R100",
-        "phase": "conclusion",
-        "condition": "very_strong_primary_temperature_combination or very_strong_primary_phenol_red_combination or very_strong_secondary_combination or very_strong_three_indicator_combination",
-        "conclusion": "very_strong_combined_signal_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R101",
-        "phase": "conclusion",
-        "condition": "high_count >= 1 and risk_count >= 2",
-        "conclusion": "high_concern_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R102",
-        "phase": "conclusion",
-        "condition": "ph_high_run >= 3 or temperature_high_run >= 3 or phenol_red_high_run >= 3",
-        "conclusion": "high_concern_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R103",
-        "phase": "conclusion",
-        "condition": "multiple_advanced_signals",
-        "conclusion": "high_concern_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R104",
-        "phase": "conclusion",
-        "condition": "very_strong_combined_signal_pattern",
-        "conclusion": "high_concern_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R105",
-        "phase": "conclusion",
-        "condition": "persistent_warning",
-        "conclusion": "persistent_concern_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R106",
-        "phase": "conclusion",
-        "condition": "worsening_over_time",
-        "conclusion": "worsening_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R107",
-        "phase": "conclusion",
-        "condition": "improving_over_time",
-        "conclusion": "improving_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R108",
-        "phase": "conclusion",
-        "condition": "stable_over_time and not persistent_warning and not worsening_over_time",
-        "conclusion": "stable_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "R109",
-        "phase": "conclusion",
-        "condition": "discordant_change_pattern and not worsening_over_time and not strong_combined_signal_pattern and not very_strong_combined_signal_pattern and not strong_secondary_combination and not high_concern_pattern",
-        "conclusion": "inconclusive_pattern",
-        "group": "conclusions",
-        "action": ""
-    },
-    {
-        "id": "A01",
-        "phase": "action",
-        "condition": "measurement_set_valid and not prior_valid_exists",
-        "conclusion": "",
-        "group": "actions",
-        "action": "baseline_only"
-    },
-    {
-        "id": "A02",
-        "phase": "action",
-        "condition": "measurement_set_valid",
-        "conclusion": "",
-        "group": "actions",
-        "action": "record_measurement"
-    },
-    {
-        "id": "A03",
-        "phase": "action",
-        "condition": "history_exists",
-        "conclusion": "",
-        "group": "actions",
-        "action": "compare_history"
-    },
-    {
-        "id": "A04",
-        "phase": "action",
-        "condition": "no_warning_signal_detected",
-        "conclusion": "",
-        "group": "actions",
-        "action": "leave_undisturbed"
-    },
-    {
-        "id": "A05",
-        "phase": "action",
-        "condition": "observation_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "recheck_tomorrow"
-    },
-    {
-        "id": "A06",
-        "phase": "action",
-        "condition": "isolated_signal_pattern and advanced_count == 0",
-        "conclusion": "",
-        "group": "actions",
-        "action": "confirm_measurement"
-    },
-    {
-        "id": "A07",
-        "phase": "action",
-        "condition": "isolated_signal_pattern and advanced_count > 0",
-        "conclusion": "",
-        "group": "actions",
-        "action": "seek_care_consider"
-    },
-    {
-        "id": "A08",
-        "phase": "action",
-        "condition": "strong_risk_worsening",
-        "conclusion": "",
-        "group": "actions",
-        "action": "recheck_12h"
-    },
-    {
-        "id": "A09",
-        "phase": "action",
-        "condition": "inconclusive_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "manual_check"
-    },
-    {
-        "id": "A10",
-        "phase": "action",
-        "condition": "insufficient_evidence",
-        "conclusion": "",
-        "group": "actions",
-        "action": "confirm_measurement"
-    },
-    {
-        "id": "A11",
-        "phase": "action",
-        "condition": "combined_signal_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "review_dressing"
-    },
-    {
-        "id": "A12",
-        "phase": "action",
-        "condition": "strong_combined_signal_pattern or very_strong_combined_signal_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "inspect_wound"
-    },
-    {
-        "id": "A13",
-        "phase": "action",
-        "condition": "persistent_concern_pattern or worsening_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "seek_care_consider"
-    },
-    {
-        "id": "A14",
-        "phase": "action",
-        "condition": "high_concern_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "seek_care"
-    },
-    {
-        "id": "A15",
-        "phase": "action",
-        "condition": "improving_pattern",
-        "conclusion": "",
-        "group": "actions",
-        "action": "record_measurement"
-    },
-    {
-        "id": "A16",
-        "phase": "action",
-        "condition": "post_dressing_change_change",
-        "conclusion": "",
-        "group": "actions",
-        "action": "review_dressing"
-    },
-    {
-        "id": "A17",
-        "phase": "action",
-        "condition": "clinician_change_approved",
-        "conclusion": "",
-        "group": "actions",
-        "action": "change_dressing"
-    },
-    {
-        "id": "A18",
-        "phase": "action",
-        "condition": "clinician_change_approved and clinician_inspect_approved",
-        "conclusion": "",
-        "group": "actions",
-        "action": "change_and_inspect"
-    }
+  {
+    "id": "R01",
+    "phase": "classification",
+    "condition": "ph_valid and (ph_value < 6)",
+    "conclusion": "ph_level=normal",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R02",
+    "phase": "classification",
+    "condition": "ph_valid and (6 <= ph_value < 6.5)",
+    "conclusion": "ph_level=observation",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R03",
+    "phase": "classification",
+    "condition": "ph_valid and (6.5 <= ph_value < 7)",
+    "conclusion": "ph_level=caution",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R04",
+    "phase": "classification",
+    "condition": "ph_valid and (7 <= ph_value < 8)",
+    "conclusion": "ph_level=infection_risk",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R05",
+    "phase": "classification",
+    "condition": "ph_valid and (ph_value >= 8)",
+    "conclusion": "ph_level=high_risk",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R06",
+    "phase": "classification",
+    "condition": "temperature_valid and (temperature_value <= 36.5)",
+    "conclusion": "temperature_level=normal",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R07",
+    "phase": "classification",
+    "condition": "temperature_valid and (36.5 < temperature_value < 37)",
+    "conclusion": "temperature_level=observation",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R08",
+    "phase": "classification",
+    "condition": "temperature_valid and (37 <= temperature_value < 37.5)",
+    "conclusion": "temperature_level=caution",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R09",
+    "phase": "classification",
+    "condition": "temperature_valid and (37.5 <= temperature_value < 38)",
+    "conclusion": "temperature_level=infection_risk",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R10",
+    "phase": "classification",
+    "condition": "temperature_valid and (temperature_value >= 38)",
+    "conclusion": "temperature_level=high_risk",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R11",
+    "phase": "classification",
+    "condition": "co2_valid and (co2_value < 600)",
+    "conclusion": "co2_level=normal",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R12",
+    "phase": "classification",
+    "condition": "co2_valid and (600 <= co2_value < 1000)",
+    "conclusion": "co2_level=observation",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R13",
+    "phase": "classification",
+    "condition": "co2_valid and (1000 <= co2_value < 1500)",
+    "conclusion": "co2_level=caution",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R14",
+    "phase": "classification",
+    "condition": "co2_valid and (1500 <= co2_value < 2500)",
+    "conclusion": "co2_level=infection_risk",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R15",
+    "phase": "classification",
+    "condition": "co2_valid and (co2_value >= 2500)",
+    "conclusion": "co2_level=high_risk",
+    "group": "levels",
+    "action": ""
+  },
+  {
+    "id": "R16",
+    "phase": "validation",
+    "condition": "not ph_valid",
+    "conclusion": "ph_input_invalid",
+    "group": "validation",
+    "action": ""
+  },
+  {
+    "id": "R17",
+    "phase": "validation",
+    "condition": "not temperature_valid",
+    "conclusion": "temperature_input_invalid",
+    "group": "validation",
+    "action": ""
+  },
+  {
+    "id": "R18",
+    "phase": "validation",
+    "condition": "not co2_valid",
+    "conclusion": "co2_input_invalid",
+    "group": "validation",
+    "action": ""
+  },
+  {
+    "id": "R19",
+    "phase": "validation",
+    "condition": "ph_valid and temperature_valid and co2_valid",
+    "conclusion": "measurement_set_valid",
+    "group": "validation",
+    "action": ""
+  },
+  {
+    "id": "R20",
+    "phase": "validation",
+    "condition": "not ph_valid or not temperature_valid or not co2_valid",
+    "conclusion": "insufficient_evidence",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R21",
+    "phase": "individual",
+    "condition": "ph_level == \"observation\"",
+    "conclusion": "ph_observation_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R22",
+    "phase": "individual",
+    "condition": "ph_level == \"caution\"",
+    "conclusion": "ph_warning_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R23",
+    "phase": "individual",
+    "condition": "ph_level == \"infection_risk\"",
+    "conclusion": "ph_severe_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R24",
+    "phase": "individual",
+    "condition": "ph_level == \"high_risk\"",
+    "conclusion": "ph_high_risk_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R25",
+    "phase": "individual",
+    "condition": "temperature_level == \"observation\"",
+    "conclusion": "temperature_observation_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R26",
+    "phase": "individual",
+    "condition": "temperature_level == \"caution\"",
+    "conclusion": "temperature_warning_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R27",
+    "phase": "individual",
+    "condition": "temperature_level == \"infection_risk\"",
+    "conclusion": "temperature_severe_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R28",
+    "phase": "individual",
+    "condition": "temperature_level == \"high_risk\"",
+    "conclusion": "temperature_high_risk_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R29",
+    "phase": "individual",
+    "condition": "co2_level == \"observation\"",
+    "conclusion": "co2_observation_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R30",
+    "phase": "individual",
+    "condition": "co2_level == \"caution\"",
+    "conclusion": "co2_warning_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R31",
+    "phase": "individual",
+    "condition": "co2_level == \"infection_risk\"",
+    "conclusion": "co2_severe_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R32",
+    "phase": "individual",
+    "condition": "co2_level == \"high_risk\"",
+    "conclusion": "co2_high_risk_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R33",
+    "phase": "individual",
+    "condition": "ph_rank >= 2",
+    "conclusion": "ph_risk_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R34",
+    "phase": "individual",
+    "condition": "temperature_rank >= 2",
+    "conclusion": "temperature_risk_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R35",
+    "phase": "individual",
+    "condition": "co2_rank >= 2",
+    "conclusion": "co2_risk_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R36",
+    "phase": "individual",
+    "condition": "ph_rank >= 3",
+    "conclusion": "ph_advanced_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R37",
+    "phase": "individual",
+    "condition": "temperature_rank >= 3",
+    "conclusion": "temperature_advanced_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R38",
+    "phase": "individual",
+    "condition": "co2_rank >= 3",
+    "conclusion": "co2_advanced_signal",
+    "group": "individual_signals",
+    "action": ""
+  },
+  {
+    "id": "R39",
+    "phase": "combined",
+    "condition": "risk_count == 1 and ph_risk_signal",
+    "conclusion": "isolated_primary_signal",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R40",
+    "phase": "combined",
+    "condition": "risk_count == 1 and temperature_risk_signal",
+    "conclusion": "isolated_temperature_signal",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R41",
+    "phase": "combined",
+    "condition": "risk_count == 1 and co2_risk_signal",
+    "conclusion": "isolated_co2_signal",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R42",
+    "phase": "combined",
+    "condition": "risk_count == 2 and ph_risk_signal and temperature_risk_signal",
+    "conclusion": "primary_temperature_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R43",
+    "phase": "combined",
+    "condition": "risk_count == 2 and ph_risk_signal and co2_risk_signal",
+    "conclusion": "primary_co2_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R44",
+    "phase": "combined",
+    "condition": "risk_count == 2 and temperature_risk_signal and co2_risk_signal",
+    "conclusion": "secondary_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R45",
+    "phase": "combined",
+    "condition": "risk_count == 3",
+    "conclusion": "three_indicator_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R46",
+    "phase": "combined",
+    "condition": "advanced_count >= 2",
+    "conclusion": "multiple_advanced_signals",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R47",
+    "phase": "combined",
+    "condition": "primary_temperature_combination and ((ph_rank >= 3 and temperature_rank == 2) or (temperature_rank >= 3 and ph_rank == 2))",
+    "conclusion": "strong_primary_temperature_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R48",
+    "phase": "combined",
+    "condition": "primary_temperature_combination and ph_rank >= 3 and temperature_rank >= 3",
+    "conclusion": "very_strong_primary_temperature_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R49",
+    "phase": "combined",
+    "condition": "primary_co2_combination and ((ph_rank >= 3 and co2_rank == 2) or (co2_rank >= 3 and ph_rank == 2))",
+    "conclusion": "strong_primary_co2_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R50",
+    "phase": "combined",
+    "condition": "primary_co2_combination and ph_rank >= 3 and co2_rank >= 3",
+    "conclusion": "very_strong_primary_co2_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R51",
+    "phase": "combined",
+    "condition": "secondary_combination and ((temperature_rank >= 3 and co2_rank == 2) or (co2_rank >= 3 and temperature_rank == 2))",
+    "conclusion": "strong_secondary_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R52",
+    "phase": "combined",
+    "condition": "secondary_combination and temperature_rank >= 3 and co2_rank >= 3",
+    "conclusion": "very_strong_secondary_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R53",
+    "phase": "combined",
+    "condition": "risk_count == 3 and advanced_count == 1",
+    "conclusion": "strong_three_indicator_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R54",
+    "phase": "combined",
+    "condition": "risk_count == 3 and advanced_count >= 2",
+    "conclusion": "very_strong_three_indicator_combination",
+    "group": "combined_signals",
+    "action": ""
+  },
+  {
+    "id": "R55",
+    "phase": "trend",
+    "condition": "not ph_comparable",
+    "conclusion": "ph_trend=unknown",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R56",
+    "phase": "trend",
+    "condition": "ph_comparable and ph_delta == 1",
+    "conclusion": "ph_trend=weakly_rising",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R57",
+    "phase": "trend",
+    "condition": "ph_comparable and ph_delta >= 2",
+    "conclusion": "ph_trend=strongly_rising",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R58",
+    "phase": "trend",
+    "condition": "ph_comparable and ph_delta == -1",
+    "conclusion": "ph_trend=weakly_falling",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R59",
+    "phase": "trend",
+    "condition": "ph_comparable and ph_delta <= -2",
+    "conclusion": "ph_trend=strongly_falling",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R60",
+    "phase": "trend",
+    "condition": "ph_comparable and ph_delta == 0",
+    "conclusion": "ph_trend=stable",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R61",
+    "phase": "trend",
+    "condition": "not temperature_comparable",
+    "conclusion": "temperature_trend=unknown",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R62",
+    "phase": "trend",
+    "condition": "temperature_comparable and temperature_delta == 1",
+    "conclusion": "temperature_trend=weakly_rising",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R63",
+    "phase": "trend",
+    "condition": "temperature_comparable and temperature_delta >= 2",
+    "conclusion": "temperature_trend=strongly_rising",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R64",
+    "phase": "trend",
+    "condition": "temperature_comparable and temperature_delta == -1",
+    "conclusion": "temperature_trend=weakly_falling",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R65",
+    "phase": "trend",
+    "condition": "temperature_comparable and temperature_delta <= -2",
+    "conclusion": "temperature_trend=strongly_falling",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R66",
+    "phase": "trend",
+    "condition": "temperature_comparable and temperature_delta == 0",
+    "conclusion": "temperature_trend=stable",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R67",
+    "phase": "trend",
+    "condition": "not co2_comparable",
+    "conclusion": "co2_trend=unknown",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R68",
+    "phase": "trend",
+    "condition": "co2_comparable and co2_delta == 1",
+    "conclusion": "co2_trend=weakly_worsening",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R69",
+    "phase": "trend",
+    "condition": "co2_comparable and co2_delta >= 2",
+    "conclusion": "co2_trend=strongly_worsening",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R70",
+    "phase": "trend",
+    "condition": "co2_comparable and co2_delta == -1",
+    "conclusion": "co2_trend=weakly_improving",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R71",
+    "phase": "trend",
+    "condition": "co2_comparable and co2_delta <= -2",
+    "conclusion": "co2_trend=strongly_improving",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R72",
+    "phase": "trend",
+    "condition": "co2_comparable and co2_delta == 0",
+    "conclusion": "co2_trend=stable",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R73",
+    "phase": "trend",
+    "condition": "ph_comparable and ph_delta > 0",
+    "conclusion": "ph_worsening_trend",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R74",
+    "phase": "trend",
+    "condition": "temperature_comparable and temperature_delta > 0",
+    "conclusion": "temperature_worsening_trend",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R75",
+    "phase": "trend",
+    "condition": "co2_comparable and co2_delta > 0",
+    "conclusion": "co2_worsening_trend",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R76",
+    "phase": "trend",
+    "condition": "worsening_count >= 2 and strong_worsening_count == 0",
+    "conclusion": "weak_multi_indicator_worsening",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R77",
+    "phase": "trend",
+    "condition": "worsening_count >= 2 and strong_worsening_count >= 1",
+    "conclusion": "strong_multi_indicator_worsening",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R78",
+    "phase": "trend",
+    "condition": "weak_multi_indicator_worsening or strong_multi_indicator_worsening",
+    "conclusion": "worsening_over_time",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R79",
+    "phase": "trend",
+    "condition": "ph_comparable and temperature_comparable and ph_delta < 0 and temperature_delta < 0 and not co2_worsening_trend",
+    "conclusion": "improving_over_time",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R80",
+    "phase": "trend",
+    "condition": "ph_comparable and co2_comparable and ph_delta < 0 and co2_delta < 0 and not temperature_worsening_trend",
+    "conclusion": "improving_over_time",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R81",
+    "phase": "trend",
+    "condition": "temperature_comparable and co2_comparable and temperature_delta < 0 and co2_delta < 0 and not ph_worsening_trend",
+    "conclusion": "improving_over_time",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R82",
+    "phase": "trend",
+    "condition": "worsening_count >= 1 and improving_count >= 1",
+    "conclusion": "discordant_change_pattern",
+    "group": "trend_results",
+    "action": ""
+  },
+  {
+    "id": "R83",
+    "phase": "persistence",
+    "condition": "ph_risk_run >= 2",
+    "conclusion": "ph_repeated_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R84",
+    "phase": "persistence",
+    "condition": "ph_risk_run >= 3",
+    "conclusion": "ph_persistent_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R85",
+    "phase": "persistence",
+    "condition": "temperature_risk_run >= 2",
+    "conclusion": "temperature_repeated_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R86",
+    "phase": "persistence",
+    "condition": "temperature_risk_run >= 3",
+    "conclusion": "temperature_persistent_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R87",
+    "phase": "persistence",
+    "condition": "co2_risk_run >= 2",
+    "conclusion": "co2_repeated_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R88",
+    "phase": "persistence",
+    "condition": "co2_risk_run >= 3",
+    "conclusion": "co2_persistent_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R89",
+    "phase": "persistence",
+    "condition": "ph_repeated_warning or temperature_repeated_warning or co2_repeated_warning",
+    "conclusion": "repeated_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R90",
+    "phase": "persistence",
+    "condition": "ph_persistent_warning or temperature_persistent_warning or co2_persistent_warning",
+    "conclusion": "persistent_warning",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R91",
+    "phase": "persistence",
+    "condition": "changed_count > 0",
+    "conclusion": "new_change_detected",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R92",
+    "phase": "persistence",
+    "condition": "all_stable_three",
+    "conclusion": "stable_over_time",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R93",
+    "phase": "persistence",
+    "condition": "dressing_change_event and changed_count > 0",
+    "conclusion": "post_dressing_change_change",
+    "group": "persistence_results",
+    "action": ""
+  },
+  {
+    "id": "R94",
+    "phase": "conclusion",
+    "condition": "normal_count == 3",
+    "conclusion": "no_warning_signal_detected",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R95",
+    "phase": "conclusion",
+    "condition": "risk_count == 0 and observation_count > 0",
+    "conclusion": "observation_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R96",
+    "phase": "conclusion",
+    "condition": "risk_count == 1",
+    "conclusion": "isolated_signal_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R97",
+    "phase": "conclusion",
+    "condition": "risk_count == 1 and high_count == 1",
+    "conclusion": "isolated_high_risk_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R98",
+    "phase": "conclusion",
+    "condition": "risk_count >= 2",
+    "conclusion": "combined_signal_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R99",
+    "phase": "conclusion",
+    "condition": "strong_primary_temperature_combination or strong_primary_co2_combination or strong_three_indicator_combination",
+    "conclusion": "strong_combined_signal_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R100",
+    "phase": "conclusion",
+    "condition": "very_strong_primary_temperature_combination or very_strong_primary_co2_combination or very_strong_secondary_combination or very_strong_three_indicator_combination",
+    "conclusion": "very_strong_combined_signal_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R101",
+    "phase": "conclusion",
+    "condition": "high_count >= 1 and risk_count >= 2",
+    "conclusion": "high_concern_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R102",
+    "phase": "conclusion",
+    "condition": "ph_high_run >= 3 or temperature_high_run >= 3 or co2_high_run >= 3",
+    "conclusion": "high_concern_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R103",
+    "phase": "conclusion",
+    "condition": "multiple_advanced_signals",
+    "conclusion": "high_concern_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R104",
+    "phase": "conclusion",
+    "condition": "very_strong_combined_signal_pattern",
+    "conclusion": "high_concern_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R105",
+    "phase": "conclusion",
+    "condition": "persistent_warning",
+    "conclusion": "persistent_concern_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R106",
+    "phase": "conclusion",
+    "condition": "worsening_over_time",
+    "conclusion": "worsening_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R107",
+    "phase": "conclusion",
+    "condition": "improving_over_time",
+    "conclusion": "improving_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R108",
+    "phase": "conclusion",
+    "condition": "stable_over_time and not persistent_warning and not worsening_over_time",
+    "conclusion": "stable_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "R109",
+    "phase": "conclusion",
+    "condition": "discordant_change_pattern and not worsening_over_time and not strong_combined_signal_pattern and not very_strong_combined_signal_pattern and not strong_secondary_combination and not high_concern_pattern",
+    "conclusion": "inconclusive_pattern",
+    "group": "conclusions",
+    "action": ""
+  },
+  {
+    "id": "A01",
+    "phase": "action",
+    "condition": "measurement_set_valid and not prior_valid_exists",
+    "conclusion": "",
+    "group": "actions",
+    "action": "baseline_only"
+  },
+  {
+    "id": "A02",
+    "phase": "action",
+    "condition": "measurement_set_valid",
+    "conclusion": "",
+    "group": "actions",
+    "action": "record_measurement"
+  },
+  {
+    "id": "A03",
+    "phase": "action",
+    "condition": "history_exists",
+    "conclusion": "",
+    "group": "actions",
+    "action": "compare_history"
+  },
+  {
+    "id": "A04",
+    "phase": "action",
+    "condition": "no_warning_signal_detected",
+    "conclusion": "",
+    "group": "actions",
+    "action": "leave_undisturbed"
+  },
+  {
+    "id": "A05",
+    "phase": "action",
+    "condition": "observation_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "recheck_tomorrow"
+  },
+  {
+    "id": "A06",
+    "phase": "action",
+    "condition": "isolated_signal_pattern and advanced_count == 0",
+    "conclusion": "",
+    "group": "actions",
+    "action": "confirm_measurement"
+  },
+  {
+    "id": "A07",
+    "phase": "action",
+    "condition": "isolated_signal_pattern and advanced_count > 0",
+    "conclusion": "",
+    "group": "actions",
+    "action": "seek_care_consider"
+  },
+  {
+    "id": "A08",
+    "phase": "action",
+    "condition": "strong_risk_worsening",
+    "conclusion": "",
+    "group": "actions",
+    "action": "recheck_12h"
+  },
+  {
+    "id": "A09",
+    "phase": "action",
+    "condition": "inconclusive_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "manual_check"
+  },
+  {
+    "id": "A10",
+    "phase": "action",
+    "condition": "insufficient_evidence",
+    "conclusion": "",
+    "group": "actions",
+    "action": "confirm_measurement"
+  },
+  {
+    "id": "A11",
+    "phase": "action",
+    "condition": "combined_signal_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "review_dressing"
+  },
+  {
+    "id": "A12",
+    "phase": "action",
+    "condition": "strong_combined_signal_pattern or very_strong_combined_signal_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "inspect_wound"
+  },
+  {
+    "id": "A13",
+    "phase": "action",
+    "condition": "persistent_concern_pattern or worsening_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "seek_care_consider"
+  },
+  {
+    "id": "A14",
+    "phase": "action",
+    "condition": "high_concern_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "seek_care"
+  },
+  {
+    "id": "A15",
+    "phase": "action",
+    "condition": "improving_pattern",
+    "conclusion": "",
+    "group": "actions",
+    "action": "record_measurement"
+  },
+  {
+    "id": "A16",
+    "phase": "action",
+    "condition": "post_dressing_change_change",
+    "conclusion": "",
+    "group": "actions",
+    "action": "review_dressing"
+  },
+  {
+    "id": "A17",
+    "phase": "action",
+    "condition": "clinician_change_approved",
+    "conclusion": "",
+    "group": "actions",
+    "action": "change_dressing"
+  },
+  {
+    "id": "A18",
+    "phase": "action",
+    "condition": "clinician_change_approved and clinician_inspect_approved",
+    "conclusion": "",
+    "group": "actions",
+    "action": "change_and_inspect"
+  },
+  {
+    "id": "Q01",
+    "phase": "conclusion",
+    "condition": "ph_score_alert or temperature_score_alert",
+    "conclusion": "numeric_score_review",
+    "group": "conclusions",
+    "action": "confirm_measurement"
+  },
+  {
+    "id": "Q02",
+    "phase": "conclusion",
+    "condition": "ph_deviation_alert or temperature_deviation_alert",
+    "conclusion": "numeric_trend_review",
+    "group": "conclusions",
+    "action": "confirm_measurement"
+  }
 ]

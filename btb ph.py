@@ -8,50 +8,36 @@ REFERENCE_COLORS = [
         "name": "강산성 지시약 (반응 강함)",
         "rgb": (240, 150, 80),
         "ph": 4.0,
-        "co2_ppm": 3500,
-        "co2_status": "높음",
     },
     {
         "name": "산성 지시약 (반응 보통)",
         "rgb": (225, 175, 110),
         "ph": 5.2,
-        "co2_ppm": 1200,
-        "co2_status": "높음",
     },
     {
         "name": "약산성 지시약 (과도기)",
         "rgb": (205, 185, 120),
         "ph": 6.0,
-        "co2_ppm": 850,
-        "co2_status": "중간",
     },
     {
         "name": "중성 지시약 (안정)",
         "rgb": (190, 180, 130),
         "ph": 6.5,
-        "co2_ppm": 600,
-        "co2_status": "중간",
     },
     {
         "name": "약알칼리성 지시약 (안정)",
         "rgb": (175, 178, 142),
         "ph": 7.0,
-        "co2_ppm": 450,
-        "co2_status": "중간",
     },
     {
         "name": "알칼리성 지시약 (정상 범위)",
         "rgb": (160, 175, 150),
         "ph": 7.4,
-        "co2_ppm": 300,
-        "co2_status": "낮음",
     },
     {
         "name": "강알칼리성 지시약 (높은 안정성)",
         "rgb": (140, 170, 160),
         "ph": 8.5,
-        "co2_ppm": 150,
-        "co2_status": "낮음",
     },
 ]
 
@@ -175,11 +161,6 @@ def measure_and_match_indicators_detailed():
     print(f" 🎯 [세분화된 표준 색상 매칭 결과]")
     print(f"   • 가장 가까운 표준 단계 : {matched_ref['name']}")
     print(f"   • 정밀 매칭 pH        : {matched_ref['ph']}")
-    print(
-        f"   • 정밀 매칭 CO₂ 농도  : {matched_ref['co2_ppm']} ppm"
-        f" ({matched_ref['co2_ppm']/10000.0:.2f}%) ->"
-        f" [{matched_ref['co2_status']}]"
-    )
     print("-" * 65)
 
     # 🔴 빨간색 박스와 번호 표시

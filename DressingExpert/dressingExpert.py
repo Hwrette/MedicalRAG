@@ -34,7 +34,7 @@ def load_actions(path):
 
 def run(data_path=None, rules_path=None, actions_path=None, *, raw=None,
         history=None, history_path=None, config_path=None, save_history=False,
-        image_path=None, layout_path=None, annotated_path=None):
+        image_path=None, layout_path=None, annotated_path=None, algorithm_config_path=None):
     """파일 또는 raw 수치를 평가한다. 이력 저장은 save_history=True일 때만 수행한다."""
     if history is not None and history_path is not None:
         raise ValueError('history와 history_path 중 하나만 지정하세요.')
@@ -62,14 +62,26 @@ def run(data_path=None, rules_path=None, actions_path=None, *, raw=None,
     elif layout_path is not None or annotated_path is not None:
         raise ValueError('layout_path/annotated_path에는 image_path가 필요합니다.')
     config = load_json(config_path or FILES_DIR / 'sensor_config.json')
+    algorithm_config = load_json(algorithm_config_path or FILES_DIR / 'algorithm_config.json')
     result = assess(raw if raw is not None else load_json(data_path or FILES_DIR / 'data.json'),
                     load_rules(rules_path or FILES_DIR / 'rules.csv'), history,
-                    config.get('temperature_range'))
+                    config.get('temperature_range'), algorithm_config)
     if image_measurement is not None:
         result['image_measurement'] = image_measurement
     result['sensor_configuration'] = config
+    result['algorithm_configuration'] = algorithm_config
+    result['simulation_mode'] = True
+    note = algorithm_config.get('note') if isinstance(algorithm_config, dict) else None
+    if note:
+        result['configuration_warnings'].append(str(note))
     catalog = load_actions(actions_path or FILES_DIR / 'actions.csv')
-    result['action_details'] = [catalog[a] for a in result['actions']]
+    result['action_details'] = []
+    for action in result.get('actions', []):
+        details = catalog.get(action)
+        if details is None:
+            result['action_details'].append({'action': action, 'description': action, 'severity': 0})
+        else:
+            result['action_details'].append(details)
     if save_history:
         # 무효 측정도 보존하여 연속 경고가 누락 구간을 건너뛰지 않게 한다.
         records = [*(history or []), result]
@@ -85,6 +97,7 @@ def main():
     source.add_argument('--data', type=Path)
     source.add_argument('--image', type=Path)
     parser.add_argument('--layout', type=Path)
+    parser.add_argument('--day', type=float, help='최초 측정일부터 일 단위 시점 (첫날=1)')
     parser.add_argument('--annotated', type=Path)
     parser.add_argument('--history', type=Path)
     parser.add_argument('--config', type=Path)
@@ -92,7 +105,8 @@ def main():
     args = parser.parse_args()
     print(json.dumps(run(data_path=args.data, history_path=args.history,
                          config_path=args.config, save_history=args.save_history,
-                         image_path=args.image, layout_path=args.layout, annotated_path=args.annotated),
+                         image_path=args.image, layout_path=args.layout, annotated_path=args.annotated,
+                         raw=({'measurement_day': args.day} if args.image and args.day is not None else None)),
                      indent=2, ensure_ascii=False))
 
 

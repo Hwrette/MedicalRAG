@@ -8,8 +8,8 @@ from DressingExpert.inference import assess, LEVELS, expression_value
 from DressingExpert.dressingExpert import FILES_DIR, load_rules, run
 
 RULES = load_rules(FILES_DIR / 'rules.csv')
-VALUES = [(5.5, 6.2, 6.8, 7.5, 8.5), (36, 36.7, 37.2, 37.7, 38.5), (8.5, 7.5, 6.8, 6.2, 5.5)]
-KEYS = ['ph_value', 'temperature_value', 'phenol_red_ph_value']
+VALUES = [(5.5, 6.2, 6.8, 7.5, 8.5), (36, 36.7, 37.2, 37.7, 38.5), (400, 800, 1200, 1800, 3000)]
+KEYS = ['ph_value', 'temperature_value', 'co2_value']
 
 
 def raw(indices=(0, 0, 0), **extra):
@@ -53,7 +53,7 @@ class InferenceTests(unittest.TestCase):
     def test_exact_boundaries(self):
         cases = [('ph_value', 'ph_level', [(0,0),(6,1),(6.5,2),(7,3),(8,4),(14,4)]),
                  ('temperature_value', 'temperature_level', [(36,0),(36.5,0),(37,2),(37.5,3),(38,4),(40,4)]),
-                 ('phenol_red_ph_value', 'phenol_red_level', [(0,4),(6,3),(6.5,2),(7,1),(8,0),(14,0)])]
+                 ('co2_value', 'co2_level', [(0,0),(600,1),(1000,2),(1500,3),(2500,4)])]
         for field, output, cases in cases:
             for value, level in cases:
                 with self.subTest(field=field, value=value):
@@ -66,14 +66,14 @@ class InferenceTests(unittest.TestCase):
             self.assertIn('ph_high_risk_signal', result['individual_signals'])
             self.assertEqual(result['combined_signals'], [])
             self.assertNotIn('isolated_signal_pattern', result['conclusions'])
-        for key in ('ph_value', 'phenol_red_ph_value'):
+        for key in ('ph_value',):
             for value in (-0.1,14.1):
                 self.assertEqual(evaluate(raw(**{key:value}))['final_assessment'], 'insufficient_evidence')
         self.assertEqual(assess(raw(), RULES)['final_assessment'], 'insufficient_evidence')
 
     def test_trends_and_discordance(self):
         result = evaluate(raw((2,1,2)), [raw()])
-        self.assertEqual(result['trend_results']['phenol_red_trend'], 'strongly_worsening')
+        self.assertEqual(result['trend_results']['co2_trend'], 'strongly_worsening')
         self.assertIn('worsening_pattern', result['conclusions'])
         self.assertIn('recheck_12h', result['actions'])
         improved = evaluate(raw(), [raw((2,2,2))])
@@ -82,7 +82,7 @@ class InferenceTests(unittest.TestCase):
         self.assertIn('inconclusive_pattern', mixed['conclusions'])
         self.assertIn('manual_check', mixed['actions'])
         unknown = evaluate()
-        self.assertTrue(all(unknown['trend_results'][n+'_trend']=='unknown' for n in ('ph','temperature','phenol_red')))
+        self.assertTrue(all(unknown['trend_results'][n+'_trend']=='unknown' for n in ('ph','temperature','co2')))
 
     def test_persistence_and_invalid_gap(self):
         high = raw((4,0,0))
@@ -106,7 +106,7 @@ class InferenceTests(unittest.TestCase):
             with self.assertRaises(ValueError): evaluate(data)
 
     def test_csv_json_and_history_roundtrip(self):
-        self.assertEqual(len(RULES),127)
+        self.assertEqual(len(RULES),129)
         self.assertEqual(RULES, load_rules(FILES_DIR / 'rules.json'))
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'history.json'

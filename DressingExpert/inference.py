@@ -8,7 +8,7 @@ from collections.abc import Mapping
 
 LEVELS = ('normal', 'observation', 'caution', 'infection_risk', 'high_risk')
 INDICATORS = {'ph': 'ph_value', 'temperature': 'temperature_value',
-              'phenol_red': 'phenol_red_ph_value'}
+              'co2': 'co2_value'}
 PRIORITY = ('insufficient_evidence', 'high_concern_pattern',
             'very_strong_combined_signal_pattern', 'strong_combined_signal_pattern',
             'isolated_high_risk_pattern', 'combined_signal_pattern',
@@ -75,7 +75,7 @@ def initial_facts(raw, rules, temperature_range):
             facts[key] = None if sep else False
     for name, key in INDICATORS.items():
         value = raw.get(key)
-        limits = temperature_range if name == 'temperature' else (0, 14)
+        limits = temperature_range if name == 'temperature' else ((0, float('inf')) if name == 'co2' else (0, 14))
         valid = finite_number(value) and limits is not None and limits[0] <= value <= limits[1]
         facts[key] = value if valid else None
         facts[name + '_valid'] = valid
@@ -170,7 +170,7 @@ def prepare_history(facts, history, rules, temperature_range):
         facts[key + '_count'] = sum(predicate(r) for r in ranks)
 
 
-def assess(raw, rules, history=None, temperature_range=None):
+def assess(raw, rules, history=None, temperature_range=None, algorithm_config=None):
     """history는 오래된 순서의 동일 상처 측정 목록이며 현재 측정은 제외한다."""
     validate_range(temperature_range)
     ids = set()
@@ -182,12 +182,26 @@ def assess(raw, rules, history=None, temperature_range=None):
     groups = {key: [] for key in ('individual_signals', 'combined_signals', 'trend_results',
                                   'persistence_results', 'conclusions', 'actions')}
     matched = []
+    algorithm_results = {}
+    for sensor in ('ph', 'temperature'):
+        facts[sensor + '_score_alert'] = False
+        facts[sensor + '_deviation_alert'] = False
+    if algorithm_config is not None:
+        if __package__:
+            from .temporal import derive
+        else:
+            from temporal import derive
+        algorithm_results = derive(raw, history or [], algorithm_config, temperature_range)
+        for sensor, values in algorithm_results.items():
+            facts[sensor + '_score_alert'] = values['risk_level'] in ('band_3', 'band_4', 'out_of_scale', 'limit_exceeded')
+            facts[sensor + '_deviation_alert'] = values['trend_status'] == 'rapid_increase'
     for phase in PHASES:
         apply_rules(facts, rules, phase, groups, matched)
         if phase == 'classification':
             prepare_history(facts, history or [], rules, temperature_range)
     final = next((c for c in PRIORITY if facts[c]), None)
     return {
+        'algorithm_results': algorithm_results,
         'input_values': {key: (str(value) if type(value) is float and not math.isfinite(value) else value)
                          for key, value in raw.items()},
         'indicator_levels': {n + '_level': facts[n + '_level'] for n in INDICATORS},

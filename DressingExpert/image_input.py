@@ -4,7 +4,7 @@ from pathlib import Path
 
 CHANNELS = {
     'temperature': 'temperature_value',
-    'phenol_red': 'phenol_red_ph_value',
+    'phenol_red': 'co2_value',
     'btb': 'ph_value',
 }
 
@@ -25,7 +25,7 @@ def validate_layout(layout):
         if not isinstance(samples, list):
             raise ValueError(f'{name}: calibration은 목록이어야 합니다.')
         limit = patch.get('max_rgb_distance')
-        if samples and (not number(limit) or limit < 0):
+        if limit is not None and (not number(limit) or limit < 0):
             raise ValueError(f'{name}: 보정 실험으로 정한 max_rgb_distance가 필요합니다.')
         if samples and len(samples) < 2:
             raise ValueError(f'{name}: 보정 기준점은 최소 두 개가 필요합니다.')
@@ -35,7 +35,7 @@ def validate_layout(layout):
             if (not isinstance(rgb, list) or len(rgb) != 3
                     or not all(number(x) and 0 <= x <= 255 for x in rgb) or not number(value)):
                 raise ValueError(f'{name}: 보정점에는 rgb 숫자 3개와 유한한 value가 필요합니다.')
-            if name != 'temperature' and not 0 <= value <= 14:
+            if name == 'btb' and not 0 <= value <= 14:
                 raise ValueError(f'{name}: pH 보정값은 0~14여야 합니다.')
             if tuple(rgb) in seen:
                 raise ValueError(f'{name}: 중복 RGB 보정점입니다.')
@@ -50,12 +50,13 @@ def match_rgb(rgb, patch):
     distances = [math.dist(rgb, s['rgb']) for s in samples]
     minimum = min(distances)
     nearest = [s for s, d in zip(samples, distances) if math.isclose(d, minimum, abs_tol=1e-9)]
-    if minimum > patch['max_rgb_distance']:
+    if patch.get('max_rgb_distance') is not None and minimum > patch['max_rgb_distance']:
         return {'value': None, 'status': 'outside_calibration', 'rgb_distance': minimum}
     if len({s['value'] for s in nearest}) > 1:
         return {'value': None, 'status': 'ambiguous_match', 'rgb_distance': minimum}
     return {'value': nearest[0]['value'], 'status': 'matched',
-            'rgb_distance': minimum, 'reference': dict(nearest[0])}
+            'rgb_distance': minimum, 'reference': dict(nearest[0]),
+            'distance_limit_configured': patch.get('max_rgb_distance') is not None}
 
 
 def measure_image(image_path, layout, annotated_path=None):
