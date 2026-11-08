@@ -1,0 +1,9 @@
+{
+  "ph_value": 6.8,
+  "temperature_value": 37.2,
+  "day_since_start": 3,
+  "day_since_change": 3,
+  "dressing_change_event": false,
+  "co2_value": 800,
+  "measurement_day": 3
+}

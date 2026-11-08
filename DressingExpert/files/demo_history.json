@@ -1,0 +1,14 @@
+[
+  {
+    "ph_value": 6.2,
+    "temperature_value": 36.7,
+    "co2_value": 500,
+    "measurement_day": 1
+  },
+  {
+    "ph_value": 6.4,
+    "temperature_value": 36.8,
+    "co2_value": 600,
+    "measurement_day": 2
+  }
+]
