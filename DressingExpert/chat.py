@@ -17,8 +17,10 @@ from langchain_core.vectorstores import InMemoryVectorStore
 
 if __package__:
     from .dressingExpert import run, load_json
+    from .input_modes import collect_measurements
 else:
     from dressingExpert import run, load_json
+    from input_modes import collect_measurements
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -131,22 +133,60 @@ class Conversation:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--data', type=Path, default=BASE_DIR / 'files' / 'data.json')
+    parser.add_argument('--data', type=Path, help='기존 JSON 입력 파일 (지정하면 JSON 입력 모드)')
+    parser.add_argument('--input-mode', choices=['image', 'manual', 'json'],
+                        help='사진/직접 수치/기존 JSON 파일 입력 방식')
+    parser.add_argument('--layout', type=Path, help='사진 분석 영역 및 RGB 보정표 JSON 경로')
     parser.add_argument('--prompt', type=Path, default=BASE_DIR / 'files' / 'prompt.txt')
     parser.add_argument('--history', type=Path, help='전문가 시스템에 전달할 기존 측정 이력 JSON')
     parser.add_argument('--rag', choices=['on', 'off'], help='생략하면 시작 시 선택')
     args = parser.parse_args()
     load_dotenv(BASE_DIR / '.env')
-    raw = load_json(args.data)
-    measurement_history = load_json(args.history) if args.history else None
+    mode = args.input_mode
+    if mode is None and (args.data is not None or args.history is not None):
+        mode = 'json'
+    if mode is None:
+        try:
+            while mode is None:
+                choice = input('입력 방식 [1: 직접 수치, 2: 사진, 3: 기존 JSON 파일]: ').strip()
+                mode = {'1': 'manual', '2': 'image', '3': 'json'}.get(choice)
+                if mode is None:
+                    print('1, 2 또는 3을 입력해 주세요.')
+        except (EOFError, KeyboardInterrupt):
+            print('입력이 취소되었습니다.')
+            return
+
+    if mode != 'json' and (args.data is not None or args.history is not None):
+        parser.error('--data와 --history는 JSON 모드에서만 사용합니다.')
+    if mode != 'image' and args.layout is not None:
+        parser.error('--layout은 이미지 모드에서만 사용합니다.')
+
+    try:
+        if mode == 'json':
+            data_file = args.data or BASE_DIR / 'files' / 'data.json'
+            raw = load_json(data_file)
+            measurement_history = load_json(args.history) if args.history else None
+            image_details = []
+        else:
+            raw, measurement_history, image_details = collect_measurements(
+                mode, layout_path=args.layout
+            )
+    except (EOFError, KeyboardInterrupt):
+        print('입력이 취소되었습니다.')
+        return
+
     payload = {'schema_version': '2.0', 'expert_input': raw,
                'measurement_history': measurement_history,
                'expert_output': run(raw=raw, history=measurement_history)}
     prompt = args.prompt.read_text(encoding='utf-8')
     model = os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
     log = Transcript(BASE_DIR / 'chat_logs')
-    log.write('세션 설정', {'model': model, 'data_file': str(args.data), 'prompt_file': str(args.prompt),
+    log.write('세션 설정', {'model': model, 'input_mode': mode,
+                          'data_file': str(data_file) if mode == 'json' else None,
+                          'prompt_file': str(args.prompt),
                           'embedding_model': 'models/gemini-embedding-001', 'k': 3})
+    if image_details:
+        log.write('이미지 분석 결과와 수동 보충 내역', image_details)
     log.write('사용한 퓨샷 프롬프트 전체', prompt)
     log.write('실제 전문가 시스템 입력·출력', payload)
     print('대화 기록:', log.path)
