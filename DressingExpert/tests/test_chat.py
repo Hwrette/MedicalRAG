@@ -4,7 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from DressingExpert.chat import Conversation, Transcript, main
+from DressingExpert.chat import Conversation, Transcript, main, make_system_prompt, BASE_DIR
 from langchain_core.documents import Document
 
 
@@ -96,6 +96,59 @@ class ChatTests(unittest.TestCase):
         self.assertIn('measurement_history', transcript)
         self.assertIn('algorithm_results', transcript)
         self.assertIn('manual', transcript)
+
+    def test_rag_modes_use_identical_system_instructions(self):
+        payload = {'expert_input': {'ph_value': 6.8}, 'expert_output': {'final_assessment': 'test'}}
+        shared = '공통 역할과 출처 규칙'
+        self.assertEqual(make_system_prompt(shared, payload, True),
+                         make_system_prompt(shared, payload, False))
+
+    def test_current_few_shot_prompt_uses_co2_field(self):
+        prompt = (BASE_DIR / 'files' / 'prompt.txt').read_text(encoding='utf-8')
+        self.assertIn('co2_value', prompt)
+        self.assertIn('algorithm_results', prompt)
+        self.assertNotIn('phenol_red_ph_value', prompt)
+        self.assertNotIn('phenol_red_level', prompt)
+
+    def test_invalid_input_json_is_logged_before_inference(self):
+        bad_json = Path(self.tmp.name) / 'invalid.json'
+        bad_json.write_text('{not a valid JSON', encoding='utf-8')
+        with patch('sys.argv', ['chat.py', '--input-mode', 'json', '--data', str(bad_json)]), \
+             patch('DressingExpert.chat.Transcript', return_value=self.log), \
+             patch('DressingExpert.chat.genai.Client') as api_client:
+            main()
+        saved = self.log.path.read_text(encoding='utf-8')
+        self.assertIn('초기화 또는 전문가 시스템 실행 실패', saved)
+        self.assertIn('JSONDecodeError', saved)
+        api_client.assert_not_called()
+
+    def test_expert_failure_keeps_input_log(self):
+        value = {'ph_value': 6.8, 'temperature_value': 37.2, 'co2_value': 800,
+                 'measurement_day': 1, 'day_since_start': 1, 'day_since_change': 1,
+                 'dressing_change_event': False}
+        with patch('sys.argv', ['chat.py', '--input-mode', 'manual', '--rag', 'off']), \
+             patch('DressingExpert.chat.collect_measurements',
+                   return_value=(value, [], [])), \
+             patch('DressingExpert.chat.run', side_effect=RuntimeError('simulated failure')), \
+             patch('DressingExpert.chat.Transcript', return_value=self.log), \
+             patch('DressingExpert.chat.genai.Client') as api_client:
+            main()
+        saved = self.log.path.read_text(encoding='utf-8')
+        self.assertIn('입력 방식과 측정값', saved)
+        self.assertIn('6.8', saved)
+        self.assertIn('초기화 또는 전문가 시스템 실행 실패', saved)
+        self.assertIn('RuntimeError', saved)
+        api_client.assert_not_called()
+
+    def test_api_client_setup_failure_is_logged(self):
+        with patch('sys.argv', ['chat.py', '--input-mode', 'json', '--rag', 'off']), \
+             patch('DressingExpert.chat.Transcript', return_value=self.log), \
+             patch('DressingExpert.chat.genai.Client', side_effect=RuntimeError('simulated')):
+            main()
+        saved = self.log.path.read_text(encoding='utf-8')
+        self.assertIn('채팅 실행 실패', saved)
+        self.assertIn('RuntimeError', saved)
+        self.assertIn('세션 종료', saved)
 
 
 if __name__ == '__main__':

@@ -144,6 +144,14 @@ Q01/Q02는 세 센서값이 모두 유효할 때 적용하는 임시 보조 규�
 python3 DressingExpert/dressingExpert.py --history DressingExpert/files/demo_history.json
 ```
 
+## 프롬프트와 오류 기록 (안정성 개선)
+
+- `DressingExpert/files/prompt.txt`: **현재 입력 방식**(`ph_value`, `temperature_value`, `co2_value`)과 `algorithm_results`를 사용하는 짧은 퓨샷 예제로 교체했습니다. 실제 `expert_output`은 예제보다 우선합니다.
+- `chat.py`는 검색 자료가 **제공된 경우에만** 문헌 내용을 사용해 출처를 표시합니다. ON/OFF 모드에 같은 시스템 지시사항을 전달하며, ON 모드에서는 검색 청크를 사용자 메시지에 추가합니다. 따라서 ON/OFF에서 바뀌는 것은 검색 문헌 제공 여부입니다.
+- 잘못된 JSON/레이아웃, 전문가 시스템 실행 실패, API 클라이언트 초기화 실패 등으로 실행을 중단할 때도 가능한 범위에서 `DressingExpert/chat_logs/`에 **오류 종류**를 남기고 안내를 출력합니다. 전문가 시스템 실행 이전에 측정 입력 로그를 기록하므로 추론 실패 시 입력값을 확인할 수 있습니다.
+- 이미지 모드에서 OpenCV/NumPy를 찾을 수 없으면 설치가 필요하다는 안내를 출력하고 작업을 종료합니다. 잘못된 이미지 파일은 기존처럼 경로를 다시 입력할 수 있습니다.
+- 테스트는 `python3 -m unittest discover -s DressingExpert/tests -v`로 실행합니다. 실제 Gemini API 호출에는 별도의 API 키와 네트워크 환경이 필요합니다.
+
 ## RAG 챗봇: 두 가지 측정 입력 방식 (새 기능)
 
 `chat.py` 실행 시 **직접 수치 입력** 또는 **이미지 입력**을 선택할 수 있습니다.

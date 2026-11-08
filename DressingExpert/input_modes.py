@@ -121,8 +121,14 @@ def collect_measurements(mode, *, layout_path=None, input_fn=input, output_fn=pr
                 try:
                     image_result = _read_image(image_path, layout)
                     break
+                except ImportError:
+                    output_fn('이미지 분석에 필요한 OpenCV(cv2) 또는 NumPy가 설치되지 않았습니다.')
+                    raise
                 except (ValueError, OSError) as error:
                     output_fn(f'이미지를 분석할 수 없습니다: {error}')
+                except Exception as error:
+                    output_fn(f'이미지 처리 중 오류가 발생했습니다: {type(error).__name__}')
+                    raise
             raw.update(image_result['input_values'])
             fallback_fields = []
             for field, label, minimum, maximum in FIELDS:

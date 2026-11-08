@@ -112,6 +112,20 @@ class InputModeTests(unittest.TestCase):
         self.assertEqual(set(details[0]['manual_fallback_fields']),
                          {'temperature_value', 'co2_value'})
 
+    def test_missing_image_library_fails_with_clear_message(self):
+        with tempfile.TemporaryDirectory() as directory:
+            image_path = Path(directory) / 'day1.png'
+            image_path.write_bytes(b'fixture')
+            messages = []
+            with patch('DressingExpert.input_modes._read_image', side_effect=ImportError('cv2')):
+                with self.assertRaises(ImportError):
+                    collect_measurements(
+                        'image',
+                        input_fn=scripted_input(['1', 'n', str(image_path)]),
+                        output_fn=messages.append,
+                    )
+            self.assertTrue(any('OpenCV' in message for message in messages))
+
 
 if __name__ == '__main__':
     unittest.main()
