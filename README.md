@@ -144,6 +144,53 @@ Q01/Q02는 세 센서값이 모두 유효할 때 적용하는 임시 보조 규�
 python3 DressingExpert/dressingExpert.py --history DressingExpert/files/demo_history.json
 ```
 
+## RAG 챗봇: 두 가지 측정 입력 방식 (새 기능)
+
+`chat.py` 실행 시 **직접 수치 입력** 또는 **이미지 입력**을 선택할 수 있습니다.
+여러 측정일의 기록을 시간순으로 입력하면, 마지막 기록을 현재값으로 사용하고
+나머지를 전문가 시스템의 `history`로 전달합니다. pH·온도 회귀 추세는 3회
+이상 유효한 연속 측정값이 있어야 계산됩니다.
+
+프로젝트 루트에서 실행합니다.
+
+```sh
+# 입력 방식을 실행 후 선택하기 (1 직접 수치 / 2 사진 / 3 기존 JSON)
+python3 DressingExpert/chat.py --rag on
+
+# 처음부터 수치를 직접 입력
+python3 DressingExpert/chat.py --input-mode manual --rag on
+
+# 각 날짜의 이미지 파일 경로 입력
+python3 DressingExpert/chat.py --input-mode image --rag on
+
+# 기존 JSON 경로 방식도 유지
+python3 DressingExpert/chat.py --input-mode json --rag on
+python3 DressingExpert/chat.py --data DressingExpert/files/data.json --rag on
+python3 DressingExpert/chat.py --data DressingExpert/files/data.json \
+  --history DressingExpert/files/demo_history.json --rag on
+```
+
+수치 입력에서는 측정 횟수, 측정일, 드레싱 교체 여부를 순서대로 입력한 뒤
+각 날짜의 pH·온도·CO₂ 수치를 입력합니다. 사진 입력에서는 날짜별 JPG/PNG
+파일 경로를 입력합니다. 최초 측정은 **1일 차**로 취급하며 이후 날짜는
+엄격히 증가해야 합니다. 현재 CLI는 정수 일자만 받습니다.
+
+**이미지 분석의 제한:** `files/image_layout.json`의 고정 영역(ROI)을
+사용하므로 사진의 구도가 달라지면 ROI를 조정해야 합니다. 현재 BTB 보정표만
+있고 온도·CO₂ 보정표는 비어 있습니다. 분석할 수 없는 값은 임의로 채우지
+않고 별도의 실측값을 입력할지 묻습니다. 입력을 생략하면 `None`으로 남고
+전문가 시스템은 종합 판단을 보류할 수 있습니다. RGB 보정표의 정확성도
+검증되지 않았으므로 실제 의료 판단에 사용하지 않습니다.
+
+입력한 현재값과 과거 이력, 전문가 시스템의 전체 출력은 기존
+`DressingExpert/chat_logs/`의 대화 기록 파일에 저장됩니다. 이미지 입력은
+이미지 파일 경로·RGB 중앙값·수동 보충 여부도 별도로 기록합니다.
+**이미지 자체는 로그에 복사하지 않으며**, 별도의 측정 이력 파일로
+자동 저장하지는 않습니다. RAG ON/OFF에서도 같은 측정 입력을 사용합니다.
+
+`--input-mode image`에는 OpenCV와 NumPy가 필요합니다. RAG 챗봇 실행에는
+기존 Gemini API 키, LangChain 및 검색 인덱스가 필요합니다.
+
 ## 이미지 입력 연결
 
 ```sh
