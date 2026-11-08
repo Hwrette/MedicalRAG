@@ -84,10 +84,10 @@ class ChatTests(unittest.TestCase):
             ],
             [],
         )
-        with patch('sys.argv', ['chat.py','--rag','off','--input-mode','manual']), \\
-             patch('DressingExpert.chat.collect_measurements', return_value=measurements) as collector, \\
-             patch('DressingExpert.chat.Transcript', return_value=self.log), \\
-             patch('DressingExpert.chat.genai.Client', return_value=self.client), \\
+        with patch('sys.argv', ['chat.py','--rag','off','--input-mode','manual']), \
+             patch('DressingExpert.chat.collect_measurements', return_value=measurements) as collector, \
+             patch('DressingExpert.chat.Transcript', return_value=self.log), \
+             patch('DressingExpert.chat.genai.Client', return_value=self.client), \
              patch('builtins.input', side_effect=['/종료']):
             main()
         collector.assert_called_once()
