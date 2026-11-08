@@ -1,3 +1,6 @@
+import json
+import os
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -150,6 +153,58 @@ class ChatTests(unittest.TestCase):
         self.assertIn('algorithm_results', prompt)
         self.assertNotIn('phenol_red_ph_value', prompt)
         self.assertNotIn('phenol_red_level', prompt)
+
+    def test_few_shot_answers_are_korean_paragraphs(self):
+        prompt = (BASE_DIR / 'files' / 'prompt.txt').read_text(encoding='utf-8')
+        style = prompt.split('[답변 방식]\n', 1)[1].split('[퓨샷:', 1)[0]
+        for requirement in ('한국어 줄글 문단', '코드 블록', 'JSON', '번호 목록',
+                            '빈 줄', 'RAG ON/OFF', '출처 목록 대신'):
+            self.assertIn(requirement, style)
+        answers = re.findall(r'^답변:\n(.*?)(?=^예제 \d|\Z)', prompt, re.M | re.S)
+        self.assertEqual(len(answers), 3)
+        for answer in answers:
+            with self.subTest(answer=answer[:40]):
+                paragraphs = answer.strip().split('\n\n')
+                self.assertGreaterEqual(len(paragraphs), 2)
+                self.assertFalse(answer.strip().startswith('"'))
+                self.assertNotRegex(answer, r'(?m)^\s*(?:[#>*-]|\d+[.)]|[가-힣 ]+:)')
+                for token in ('```', '`', '{', '}', '[', ']', '|', '**'):
+                    self.assertNotIn(token, answer)
+                for paragraph in paragraphs:
+                    self.assertRegex(paragraph, '[가-힣]')
+
+    def test_cli_prompt_selection_reaches_both_rag_modes_from_other_directory(self):
+        default = (BASE_DIR / 'files' / 'prompt.txt').read_text(encoding='utf-8')
+        custom = Path(self.tmp.name) / 'custom.txt'
+        custom.write_text('사용자 지정 프롬프트', encoding='utf-8')
+        legacy = BASE_DIR / 'files' / 'prompt_legacy.txt'
+        cases = [([], default),
+                 (['--prompt', custom.name], custom.read_text(encoding='utf-8')),
+                 (['--prompt', str(legacy)], legacy.read_text(encoding='utf-8'))]
+        original_directory = Path.cwd()
+        self.addCleanup(os.chdir, original_directory)
+        os.chdir(self.tmp.name)
+        for options, expected in cases:
+            with self.subTest(options=options):
+                self.client.reset_mock()
+                with patch('sys.argv', ['chat.py', '--input-mode', 'json', '--rag', 'off', *options]), \
+                     patch('DressingExpert.chat.Transcript', return_value=self.log), \
+                     patch('DressingExpert.chat.genai.Client', return_value=self.client), \
+                     patch('DressingExpert.chat.InMemoryVectorStore.load', return_value=self.store), \
+                     patch('DressingExpert.chat.GoogleGenerativeAIEmbeddings'), \
+                     patch('builtins.input', side_effect=['/rag on', '근거 설명', '/종료']):
+                    main()
+                calls = self.client.models.generate_content.call_args_list
+                self.assertEqual(len(calls), 2)
+                instructions = [call.kwargs['config']['system_instruction'] for call in calls]
+                self.assertEqual(instructions[0], instructions[1])
+                self.assertTrue(instructions[0].startswith(expected + '\n\n[현재 실행 정책]'))
+                payload = json.loads(instructions[0].split(
+                    '[이번 세션의 실제 전문가 시스템 입력과 출력]\n', 1)[1])
+                for field in ('facts', 'matched_rules', 'fired_rules', 'algorithm_results'):
+                    self.assertIn(field, payload['expert_output'])
+                self.assertNotIn('근거 본문', str(calls[0].kwargs['contents']))
+                self.assertIn('근거 본문', str(calls[1].kwargs['contents']))
 
     def test_invalid_input_json_is_logged_before_inference(self):
         bad_json = Path(self.tmp.name) / 'invalid.json'

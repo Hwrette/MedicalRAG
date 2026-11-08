@@ -158,6 +158,28 @@ python3 DressingExpert/dressingExpert.py --history DressingExpert/files/demo_his
 퓨샷은 일부 항목만 발췌한 가상 예제이고, **실제 실행의 전체 딕셔너리가 항상 우선**합니다.
 RAG 문헌은 일반 의학 배경 설명용이며 전문가 시스템의 임시 규칙을 검증하지 않습니다.
 
+### 현재 프롬프트 선택과 답변 형식
+
+기본 실행은 `DressingExpert/chat.py`의 `--prompt` 기본값인
+`DressingExpert/files/prompt.txt`를 UTF-8로 읽습니다. 스크립트 위치를 기준으로
+찾으므로 실행 폴더가 달라도 기본 프롬프트는 같습니다. `--prompt 경로`를
+지정하면 해당 파일로 대체하며, 상대 경로는 실행 폴더 기준입니다.
+`prompt_legacy.txt`로 자동 전환하거나 두 파일을 합치는 동작은 없습니다.
+
+`prompt_legacy.txt`는 과거 `humidity/co2/temperature/ph`, `low/medium/high`,
+`pending_rules/missing_facts` 중심의 참고용 프롬프트입니다. 라벨과 행동 목록을
+사용하는 옛 답변 예제가 있어 현재 엔진용 기본 프롬프트로 사용하지 않습니다.
+현재 `prompt.txt`는 `ph_value/temperature_value/co2_value`, 전체 facts와 실행 규칙,
+대표 평가 및 R/D 계산을 설명하며, 답변 예제도 빈 줄로 나눈 한국어 문단입니다.
+
+읽은 프롬프트는 `Conversation`에서 `make_system_prompt()`로 전달되고,
+실행 정책과 전체 입력·출력 JSON이 붙어 Gemini의 `config.system_instruction`에
+들어갑니다. RAG ON/OFF의 시스템 지시사항은 같고, 검색 자료는 ON에서만
+사용자 메시지에 추가됩니다. 답변은 제목, 코드, JSON, 표, 목록 없이 짧은 한국어
+문단으로 작성하고, 필요한 규칙 ID와 문헌 출처는 문장 안에 표시하도록 지시합니다.
+이는 모델에 대한 지시이며, 응답을 강제로 변환하거나 형식을 검증하는 후처리는 없습니다.
+콘솔의 진행 안내·검색 출처 표시와 로그의 원본 JSON은 별도로 유지됩니다.
+
 ## 프롬프트와 오류 기록 (안정성 개선)
 
 - `DressingExpert/files/prompt.txt`: **현재 입력 방식**(`ph_value`, `temperature_value`, `co2_value`)과 `algorithm_results`를 사용하는 짧은 퓨샷 예제로 교체했습니다. 실제 `expert_output`은 예제보다 우선합니다.
