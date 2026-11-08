@@ -144,6 +144,20 @@ Q01/Q02는 세 센서값이 모두 유효할 때 적용하는 임시 보조 규�
 python3 DressingExpert/dressingExpert.py --history DressingExpert/files/demo_history.json
 ```
 
+## 전문가 시스템 전체 결과를 자연어로 해설하는 프롬프트
+
+`chat.py`는 `dressingExpert.run()`이 반환한 **전체 딕셔너리**를
+`payload['expert_output']`에 그대로 담고, `make_system_prompt()`에서
+`json.dumps(payload, ensure_ascii=False, indent=2)`로 직렬화합니다.
+`facts`, `matched_rules`(ID/조건/결론/행동), `fired_rules`,
+`algorithm_results`, `final_assessment` 등도 모두 LLM 시스템 프롬프트로 전달합니다.
+
+`files/prompt.txt`의 퓨샷은 실제 적용 규칙의 **condition → facts 변화/신호 → 대표 평가 → 행동 항목**을 이해하기 쉬운 문장으로 설명하도록 설계되어 있습니다.
+아울러 유효하지 않은 입력, 시간 추세 계산이 불가능한 경우, R/D 보조 경고와
+대표 평가의 차이를 예시로 보여 줍니다.
+퓨샷은 일부 항목만 발췌한 가상 예제이고, **실제 실행의 전체 딕셔너리가 항상 우선**합니다.
+RAG 문헌은 일반 의학 배경 설명용이며 전문가 시스템의 임시 규칙을 검증하지 않습니다.
+
 ## 프롬프트와 오류 기록 (안정성 개선)
 
 - `DressingExpert/files/prompt.txt`: **현재 입력 방식**(`ph_value`, `temperature_value`, `co2_value`)과 `algorithm_results`를 사용하는 짧은 퓨샷 예제로 교체했습니다. 실제 `expert_output`은 예제보다 우선합니다.
