@@ -103,6 +103,47 @@ class ChatTests(unittest.TestCase):
         self.assertEqual(make_system_prompt(shared, payload, True),
                          make_system_prompt(shared, payload, False))
 
+    def test_complete_expert_dictionary_reaches_gemini(self):
+        """모든 facts와 실행 규칙 객체가 생략 없이 모델 시스템 프롬프트에 포함된다."""
+        expert = {
+            'facts': {'ph_valid': True, 'ph_rank': 2, 'risk_count': 2},
+            'matched_rules': [{
+                'id': 'R42', 'phase': 'combined',
+                'condition': 'risk_count == 2 and ph_risk_signal and temperature_risk_signal',
+                'conclusion': 'primary_temperature_combination',
+                'group': 'combined_signals', 'action': ''
+            }],
+            'fired_rules': ['R03', 'R08', 'R42', 'R98'],
+            'algorithm_results': {'ph': {'status': 'calculated', 'slope_deviation': 0.1}},
+            'final_assessment': 'combined_signal_pattern',
+        }
+        payload = {
+            'schema_version': '2.0',
+            'expert_input': {'ph_value': 6.8},
+            'measurement_history': [{'ph_value': 6.2}],
+            'expert_output': expert,
+        }
+        chat = Conversation(self.client, 'test-model', 'instructions',
+                            payload, self.log, self.loader)
+        chat.answer('왜 이런 결론이 나왔어?', False)
+        instruction = self.client.models.generate_content.call_args.kwargs[
+            'config']['system_instruction']
+        self.assertIn('"matched_rules"', instruction)
+        self.assertIn('"facts"', instruction)
+        self.assertIn('"fired_rules"', instruction)
+        self.assertIn('"algorithm_results"', instruction)
+        self.assertIn('"risk_count": 2', instruction)
+        self.assertIn('"condition": "risk_count == 2 and ph_risk_signal and temperature_risk_signal"', instruction)
+        self.assertIn('"measurement_history"', instruction)
+        self.assertIn('"final_assessment": "combined_signal_pattern"', instruction)
+
+    def test_few_shot_covers_fact_and_matched_rule_explanation(self):
+        prompt = (BASE_DIR / 'files' / 'prompt.txt').read_text(encoding='utf-8')
+        for term in ('expert_output.facts', 'expert_output.matched_rules',
+                     'expert_output.fired_rules', 'condition', 'final_assessment',
+                     'expert_output.algorithm_results', 'R42', 'Q01', 'Q02'):
+            self.assertIn(term, prompt)
+
     def test_current_few_shot_prompt_uses_co2_field(self):
         prompt = (BASE_DIR / 'files' / 'prompt.txt').read_text(encoding='utf-8')
         self.assertIn('co2_value', prompt)
