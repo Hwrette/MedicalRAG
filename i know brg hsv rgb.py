@@ -3,7 +3,8 @@ import numpy as np
 
 
 def analyze_patches_robustly():
-  target_image = "KakaoTalk_20261113_192518326_07.png"
+  # 실제 파일 확장자에 맞춘 이미지 경로 (필요시 '이미지 폴더/' 경로 확인)
+  target_image = "KakaoTalk_20261113_192518326_05.png"
 
   img_bgr = cv2.imread(target_image)
   if img_bgr is None:
@@ -33,7 +34,6 @@ def analyze_patches_robustly():
       thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
   )
   if contours:
-    # 🐛 [수정 완료] max() 함수에 key=cv2.contourArea 지정
     pad_cnt = max(contours, key=cv2.contourArea)
     px, py, pw, ph = cv2.boundingRect(pad_cnt)
   else:
@@ -73,32 +73,44 @@ def analyze_patches_robustly():
     x, y, bw, bh = box
 
     # =====================================================================
-    # [3단계] 보정된 이미지에서 평균 RGB 추출 및 수치 환산
+    # [3단계-추가] 🌟 색보정 전 (원본 이미지) 평균 RGB 값 추출
+    # =====================================================================
+    raw_crop_bgr = img_bgr[y : y + bh, x : x + bw]
+    raw_crop_rgb = cv2.cvtColor(raw_crop_bgr, cv2.COLOR_BGR2RGB)
+    raw_mean_rgb = np.mean(raw_crop_rgb, axis=(0, 1))
+    raw_r, raw_g, raw_b = raw_mean_rgb
+
+    # =====================================================================
+    # [3단계] 색보정 후 (정규화된 이미지) 평균 RGB 추출 및 수치 환산
     # =====================================================================
     crop_bgr = img_norm[y : y + bh, x : x + bw]
     crop_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
     mean_rgb = np.mean(crop_rgb, axis=(0, 1))
     r, g, b = mean_rgb
 
+    # 📊 보정 전후 값 비교 출력
+    print(f"🔹 [{patch_name}] (x={x}, y={y})")
+    print(
+        f"   - [보정 전 Raw RGB] R={raw_r:.1f}, G={raw_g:.1f}, B={raw_b:.1f}"
+    )
+    print(f"   - [보정 후 Norm RGB] R={r:.1f}, G={g:.1f}, B={b:.1f}")
+
     if "Temperature" in patch_name:
       temp_val = 36.5 if g > r else 37.5
       metric_str = f"Temp: {temp_val}C"
-      print(f"🔹 [{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
-      print(f" -> Measured Temperature: {temp_val:.1f}°C")
+      print(f"   -> Measured Temperature: {temp_val:.1f}°C")
 
     elif "Phenol Red" in patch_name:
       ph_val = 6.8 + ((r - g) / 255.0) * 1.6
       ph_val = min(8.4, max(6.8, ph_val))
       metric_str = f"pH: {ph_val:.2f}"
-      print(f"🔹 [{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
-      print(f" -> Measured pH Value (Phenol Red): pH {ph_val:.2f}")
+      print(f"   -> Measured co2 Value (Phenol Red): co2 {ph_val:.2f}")
 
     elif "BTB" in patch_name:
       ph_val = 6.0 + ((b - r) / 255.0) * 3.0
       ph_val = min(10.0, max(4.0, ph_val))
       metric_str = f"pH: {ph_val:.2f}"
-      print(f"🔹 [{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
-      print(f" -> Measured pH Value (BTB): pH {ph_val:.2f}")
+      print(f"   -> Measured pH Value (BTB): pH {ph_val:.2f}")
 
     print("-" * 65)
 
@@ -117,6 +129,11 @@ def analyze_patches_robustly():
   output_file = "robust_measured_result.jpg"
   cv2.imwrite(output_file, img_bgr)
   print(f"Result image saved as '{output_file}'.")
+
+  # 화면 출력 추가 (원하시면 주석 해제하여 사용 가능)
+  # cv2.imshow("Result", img_bgr)
+  # cv2.waitKey(0)
+  # cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
