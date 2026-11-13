@@ -1,0 +1,167 @@
+[
+  {
+    "question": "제가 입력한 측정일과 각 측정값, 이전 기록과 교체 여부를 먼저 쉬운 말로 들려주세요. 이어서 이번 결과가 왜 나왔고 어떤 행동이 제안됐는지 설명해 주세요.",
+    "query": "제가 입력한 측정일과 각 측정값, 이전 기록과 교체 여부를 먼저 쉬운 말로 들려주세요. 이어서 이번 결과가 왜 나왔고 어떤 행동이 제안됐는지 설명해 주세요.\n{\"assessment\": \"observation_pattern\", \"levels\": {\"ph_level\": \"normal\", \"temperature_level\": \"normal\", \"co2_level\": \"observation\"}, \"actions\": [\"baseline_only\", \"record_measurement\", \"recheck_tomorrow\"]}",
+    "chunks": [
+      {
+        "rank": 1,
+        "text": "Disclosure: Nancy L Kopitnik declares no relevant financial relationships with ineligible companies.\nCopyright © 2025, StatPearls Publishing LLC.\nThis book is distributed under the terms of the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International\n(CC BY-NC-ND 4.0) (http://creativecommons.org/licenses/by-nc-nd/4.0/), which permits others to distribute the work,\nprovided that the article is not altered or used commercially. You are not required to obtain permission to distribute this article,\nprovided that you credit the author and journal.\nBookshelf ID: NBK535406PMID: 30571027",
+        "metadata": {
+          "source": "Physiology, Wound Healing - StatPearls - NCBI Bookshelf.pdf",
+          "page": 9,
+          "chunk_id": 337
+        }
+      },
+      {
+        "rank": 2,
+        "text": "as temperature and skin impedance, providing crucial indicators of infection, hydration, \nand inflammation. Conversely, electrochemical sensors leverage techniques including \namperometry, potentiometry, and voltammetry, to precisely quantify alterations in electrical \nsignals at the sensor interface, facilitating detailed analysis of chemical and biological \nprocesses. For ions (such as Na+, Ca2+, and NH4+) and pH monitoring, potentiometry is \nprimarily employed, utilizing ion-selective electrodes (ISEs) modified with ionophores (such \nas valinomycin) that selectively and reversibly bind to ions or ion-sensitive materials (such \nas polyaniline for pH sensing)113, 114. The measured voltage difference between the ISE \nand the reference electrode shows a log-linear relationship with the analyte concentration. \nThe detection of metabolites such as glucose, uric acid, and lactate can be achieved \nusing amperometric enzymatic electrodes immobilized with a specific enzyme (such as",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 13,
+          "chunk_id": 491
+        }
+      },
+      {
+        "rank": 3,
+        "text": "sensor regeneration96, 115. When selecting biomarker measurement methods, it’s essential \nto consider their physiological concentration ranges. For instance, glucose levels in wound \nexudate can range into the tens of mM, whereas uric acid concentrations might hover around \n100 μM95. The presence and concentration of specific biomarkers are influenced by the \nwound healing stage and the type of wound. For example, as wounds advance towards the \nproliferative and remodeling phases, the pH level typically decreases. Animal studies have \nshown that lactate concentration, a crucial indicator of cellular metabolism and hypoxia, \npeaks within the first three days post-injury. In diabetic wounds, lactate levels can surpass \nthe 5–15 mM range typical for non-diabetic wounds, indicating the distinct metabolic \nchallenges in diabetic wound healing116. Techniques like square wave voltammetry (SWV) \nand differential pulse voltammetry (DPV) offer greater sensitivity compared to linear sweep",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 13,
+          "chunk_id": 493
+        }
+      }
+    ]
+  },
+  {
+    "question": "세 패치 중 어떤 값 때문에 이번 결과가 나왔나요? 이 사진 한 장으로 어제보다 나아졌는지도 알 수 있나요?",
+    "query": "제가 입력한 측정일과 각 측정값, 이전 기록과 교체 여부를 먼저 쉬운 말로 들려주세요. 이어서 이번 결과가 왜 나왔고 어떤 행동이 제안됐는지 설명해 주세요.\n세 패치 중 어떤 값 때문에 이번 결과가 나왔나요? 이 사진 한 장으로 어제보다 나아졌는지도 알 수 있나요?\n{\"assessment\": \"observation_pattern\", \"levels\": {\"ph_level\": \"normal\", \"temperature_level\": \"normal\", \"co2_level\": \"observation\"}, \"actions\": [\"baseline_only\", \"record_measurement\", \"recheck_tomorrow\"]}",
+    "chunks": [
+      {
+        "rank": 1,
+        "text": "which must subsequently be quantified by an external system. This stands in contrast to \nelectrochemical sensors, which provide a more rapid, real-time electronic conversion of data. \nThese characteristics pose challenges, particularly in scenarios requiring high-frequency \ncontinuous data collection. Additionally, the sensitivity and selectivity of this method can \nbe influenced by environmental factors such as ambient light conditions and the optical \nproperties of the wound matrix.\nImaging sensors: Various imaging modalities can provide visual and quantitative insights \ninto critical wound characteristics such as size, depth, volume, and tissue composition. \nConventional digital photography is commonly used for surface visualization of wounds, \nfacilitating the monitoring of changes in size and appearance over time.\nInfrared thermography is a powerful technique for mapping wound temperature, with",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 14,
+          "chunk_id": 497
+        }
+      },
+      {
+        "rank": 2,
+        "text": "as temperature and skin impedance, providing crucial indicators of infection, hydration, \nand inflammation. Conversely, electrochemical sensors leverage techniques including \namperometry, potentiometry, and voltammetry, to precisely quantify alterations in electrical \nsignals at the sensor interface, facilitating detailed analysis of chemical and biological \nprocesses. For ions (such as Na+, Ca2+, and NH4+) and pH monitoring, potentiometry is \nprimarily employed, utilizing ion-selective electrodes (ISEs) modified with ionophores (such \nas valinomycin) that selectively and reversibly bind to ions or ion-sensitive materials (such \nas polyaniline for pH sensing)113, 114. The measured voltage difference between the ISE \nand the reference electrode shows a log-linear relationship with the analyte concentration. \nThe detection of metabolites such as glucose, uric acid, and lactate can be achieved \nusing amperometric enzymatic electrodes immobilized with a specific enzyme (such as",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 13,
+          "chunk_id": 491
+        }
+      },
+      {
+        "rank": 3,
+        "text": "in light emission (exemplified by changes in fluorescence or luminescence). Notably, these \nalterations are directly associated with the levels of analyte molecules.\nIn the realm of wound care, optical sensors, predominantly colorimetric ones, have been \ndeveloped to monitor crucial parameters including temperature, pH and small molecules \nsuch as oxygen and amino acids119. The benefits of employing colorimetric sensors \nin wound care include direct visual detection, design simplicity, cost effectiveness, and \nease of operation. Nevertheless, when compared to electrochemical sensors, colorimetric \nsensors exhibit a slower response time and require an external readout system to \nachieve quantitative measurements. Their dependence on visual color transformations \nresulting from chemical reactions requires a duration to gather observable alterations, \nwhich must subsequently be quantified by an external system. This stands in contrast to",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 14,
+          "chunk_id": 496
+        }
+      }
+    ]
+  },
+  {
+    "question": "페놀레드 패치의 pH는 제 상처의 pH나 이산화탄소 농도와 같은 건가요? 이 값 하나로 감염인지 알 수 있나요?",
+    "query": "제가 입력한 측정일과 각 측정값, 이전 기록과 교체 여부를 먼저 쉬운 말로 들려주세요. 이어서 이번 결과가 왜 나왔고 어떤 행동이 제안됐는지 설명해 주세요.\n세 패치 중 어떤 값 때문에 이번 결과가 나왔나요? 이 사진 한 장으로 어제보다 나아졌는지도 알 수 있나요?\n페놀레드 패치의 pH는 제 상처의 pH나 이산화탄소 농도와 같은 건가요? 이 값 하나로 감염인지 알 수 있나요?\n{\"assessment\": \"observation_pattern\", \"levels\": {\"ph_level\": \"normal\", \"temperature_level\": \"normal\", \"co2_level\": \"observation\"}, \"actions\": [\"baseline_only\", \"record_measurement\", \"recheck_tomorrow\"]}",
+    "chunks": [
+      {
+        "rank": 1,
+        "text": "which must subsequently be quantified by an external system. This stands in contrast to \nelectrochemical sensors, which provide a more rapid, real-time electronic conversion of data. \nThese characteristics pose challenges, particularly in scenarios requiring high-frequency \ncontinuous data collection. Additionally, the sensitivity and selectivity of this method can \nbe influenced by environmental factors such as ambient light conditions and the optical \nproperties of the wound matrix.\nImaging sensors: Various imaging modalities can provide visual and quantitative insights \ninto critical wound characteristics such as size, depth, volume, and tissue composition. \nConventional digital photography is commonly used for surface visualization of wounds, \nfacilitating the monitoring of changes in size and appearance over time.\nInfrared thermography is a powerful technique for mapping wound temperature, with",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 14,
+          "chunk_id": 497
+        }
+      },
+      {
+        "rank": 2,
+        "text": "edge extending out 4cm and including any skin and tissue under \nthe wound dressing.394 The periwound region can be affected \nby moisture (e.g. maceration and excoriation) or may be dry, or \ndevelop hyperkeratosis, callus or eczema.394 The periwound region \ncan be indicative of the wound infection (e.g. erythema, warmth \nand swelling indicates potential wound infection).394 \npH: A measure on a scale from 0–14 of acidity or alkalinity, with 7 \nbeing neutral, greater than 7 being more alkaline and less than 7 \nbeing more acidic. The skin has a natural pH of around 5.5.\nPhagocytosis: A cellular process by which certain living cells ingest \nand destroy other large cells or particles. Phagocytosis is a critical \nfirst line component of the host’s defence, with phagocytes (e.g. \nneutrophils and macrophages) detecting and binding to the cell \nsurface of invading microorganisms in order to eradicate them. \nThe process of phagocytosis also initiates other host immune",
+        "metadata": {
+          "source": "8-wound-infection-in-clinical-practice-principles-of-best-practices-2022.pdf",
+          "page": 48,
+          "chunk_id": 206
+        }
+      },
+      {
+        "rank": 3,
+        "text": "system is sufficiently repaired and the tissue oxygenation and metabolic needs are met. It is these\nnew capillary tuffs that give granulation tissue its characteristic bumpy or granular appearance.\nGranulation\nGranulation tissue is a transitional replacement for normal dermis, which eventually matures into\na scar during the remodelling phase of healing. It is characterized from unwounded dermis by an\nextremely dense network of blood vessels and capillaries, elevated cellular density of fibroblasts\nand macrophages and randomly organized collagen fibers. It also has an elevated metabolic rate\ncompared to normal dermis, which reflects the activity required for cellular migration and\ndivision and protein synthesis.\nEpithelialization\nAll dermal wounds heal by three basic mechanisms: contraction, connective tissue matrix\ndeposition and epithelialization. Wounds that remain open heal by contraction; the interaction",
+        "metadata": {
+          "source": "Principles of Wound Healing - Mechanisms of Vascular Disease - NCBI Bookshelf.pdf",
+          "page": 6,
+          "chunk_id": 364
+        }
+      }
+    ]
+  },
+  {
+    "question": "다음에 드레싱을 확인할 때 진물이나 냄새, 통증이 어떻게 달라졌는지 무엇을 기록해 두면 좋을까요?",
+    "query": "세 패치 중 어떤 값 때문에 이번 결과가 나왔나요? 이 사진 한 장으로 어제보다 나아졌는지도 알 수 있나요?\n페놀레드 패치의 pH는 제 상처의 pH나 이산화탄소 농도와 같은 건가요? 이 값 하나로 감염인지 알 수 있나요?\n다음에 드레싱을 확인할 때 진물이나 냄새, 통증이 어떻게 달라졌는지 무엇을 기록해 두면 좋을까요?\n{\"assessment\": \"observation_pattern\", \"levels\": {\"ph_level\": \"normal\", \"temperature_level\": \"normal\", \"co2_level\": \"observation\"}, \"actions\": [\"baseline_only\", \"record_measurement\", \"recheck_tomorrow\"]}",
+    "chunks": [
+      {
+        "rank": 1,
+        "text": "edge extending out 4cm and including any skin and tissue under \nthe wound dressing.394 The periwound region can be affected \nby moisture (e.g. maceration and excoriation) or may be dry, or \ndevelop hyperkeratosis, callus or eczema.394 The periwound region \ncan be indicative of the wound infection (e.g. erythema, warmth \nand swelling indicates potential wound infection).394 \npH: A measure on a scale from 0–14 of acidity or alkalinity, with 7 \nbeing neutral, greater than 7 being more alkaline and less than 7 \nbeing more acidic. The skin has a natural pH of around 5.5.\nPhagocytosis: A cellular process by which certain living cells ingest \nand destroy other large cells or particles. Phagocytosis is a critical \nfirst line component of the host’s defence, with phagocytes (e.g. \nneutrophils and macrophages) detecting and binding to the cell \nsurface of invading microorganisms in order to eradicate them. \nThe process of phagocytosis also initiates other host immune",
+        "metadata": {
+          "source": "8-wound-infection-in-clinical-practice-principles-of-best-practices-2022.pdf",
+          "page": 48,
+          "chunk_id": 206
+        }
+      },
+      {
+        "rank": 2,
+        "text": "in light emission (exemplified by changes in fluorescence or luminescence). Notably, these \nalterations are directly associated with the levels of analyte molecules.\nIn the realm of wound care, optical sensors, predominantly colorimetric ones, have been \ndeveloped to monitor crucial parameters including temperature, pH and small molecules \nsuch as oxygen and amino acids119. The benefits of employing colorimetric sensors \nin wound care include direct visual detection, design simplicity, cost effectiveness, and \nease of operation. Nevertheless, when compared to electrochemical sensors, colorimetric \nsensors exhibit a slower response time and require an external readout system to \nachieve quantitative measurements. Their dependence on visual color transformations \nresulting from chemical reactions requires a duration to gather observable alterations, \nwhich must subsequently be quantified by an external system. This stands in contrast to",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 14,
+          "chunk_id": 496
+        }
+      },
+      {
+        "rank": 3,
+        "text": "which must subsequently be quantified by an external system. This stands in contrast to \nelectrochemical sensors, which provide a more rapid, real-time electronic conversion of data. \nThese characteristics pose challenges, particularly in scenarios requiring high-frequency \ncontinuous data collection. Additionally, the sensitivity and selectivity of this method can \nbe influenced by environmental factors such as ambient light conditions and the optical \nproperties of the wound matrix.\nImaging sensors: Various imaging modalities can provide visual and quantitative insights \ninto critical wound characteristics such as size, depth, volume, and tissue composition. \nConventional digital photography is commonly used for surface visualization of wounds, \nfacilitating the monitoring of changes in size and appearance over time.\nInfrared thermography is a powerful technique for mapping wound temperature, with",
+        "metadata": {
+          "source": "nihms-2086081.pdf",
+          "page": 14,
+          "chunk_id": 497
+        }
+      }
+    ]
+  },
+  {
+    "question": "상처 주변의 붉은 부위가 퍼지거나 열이 난다면, 패치 결과가 그대로여도 의료진에게 알려야 하나요?",
+    "query": "페놀레드 패치의 pH는 제 상처의 pH나 이산화탄소 농도와 같은 건가요? 이 값 하나로 감염인지 알 수 있나요?\n다음에 드레싱을 확인할 때 진물이나 냄새, 통증이 어떻게 달라졌는지 무엇을 기록해 두면 좋을까요?\n상처 주변의 붉은 부위가 퍼지거나 열이 난다면, 패치 결과가 그대로여도 의료진에게 알려야 하나요?\n{\"assessment\": \"observation_pattern\", \"levels\": {\"ph_level\": \"normal\", \"temperature_level\": \"normal\", \"co2_level\": \"observation\"}, \"actions\": [\"baseline_only\", \"record_measurement\", \"recheck_tomorrow\"]}",
+    "chunks": [
+      {
+        "rank": 1,
+        "text": "edge extending out 4cm and including any skin and tissue under \nthe wound dressing.394 The periwound region can be affected \nby moisture (e.g. maceration and excoriation) or may be dry, or \ndevelop hyperkeratosis, callus or eczema.394 The periwound region \ncan be indicative of the wound infection (e.g. erythema, warmth \nand swelling indicates potential wound infection).394 \npH: A measure on a scale from 0–14 of acidity or alkalinity, with 7 \nbeing neutral, greater than 7 being more alkaline and less than 7 \nbeing more acidic. The skin has a natural pH of around 5.5.\nPhagocytosis: A cellular process by which certain living cells ingest \nand destroy other large cells or particles. Phagocytosis is a critical \nfirst line component of the host’s defence, with phagocytes (e.g. \nneutrophils and macrophages) detecting and binding to the cell \nsurface of invading microorganisms in order to eradicate them. \nThe process of phagocytosis also initiates other host immune",
+        "metadata": {
+          "source": "8-wound-infection-in-clinical-practice-principles-of-best-practices-2022.pdf",
+          "page": 48,
+          "chunk_id": 206
+        }
+      },
+      {
+        "rank": 2,
+        "text": "wound.5-8 Research has established that, in the in vivo setting, an infectious microenvironment \ndevelops, with low oxygen (hypoxic conditions),2 pH changes and slow-growing microbial cells.130 \nThese physiochemical properties of the wound microenvironment are different from in vitro model \nsystems and are important to understanding the potential inaccuracies that arise in extrapolating \nin vitro research directly to the clinical environment. \nOngoing evolution of the wound infection continuum highlights the importance of interactions \nbetween basic research and clinical observation with respect to understanding wound infection \nand managing wounds and their microorganisms and/ or biofilms. \nWHAT IS KNOWN (AND UNKNOWN) ABOUT WOUND BIOFILMS? \nAs described in the literature, in vitro biofilms are initiated by planktonic microorganisms and \nfollow a defined developmental cycle. The in vitro hallmark of biofilms is the presence of a self-",
+        "metadata": {
+          "source": "8-wound-infection-in-clinical-practice-principles-of-best-practices-2022.pdf",
+          "page": 19,
+          "chunk_id": 78
+        }
+      },
+      {
+        "rank": 3,
+        "text": "■ Loss of appetite\n■ Fever/pyrexia\n■ Severe sepsis \n■ Septic shock\n■ Organ failure \n■ Death.  \nCLINICAL ASSESSMENT OF WOUND INFECTION  \nContinuous, accurate, holistic assessment of the individual and their wound are essential for \neffective wound treatment.73, 74 Early identification and subsequent treatment to reduce or eliminate \ninfection is clinically and economically beneficial, and essential to facilitate wound healing75-78 and to \nreduce the impact on the individual, their family caregivers and on healthcare systems.79 Undertaking \nholistic assessment of wound infection risk, including evaluation of host factors, and the wound \nhistory is discussed under 07 Holistic Assessment and Management. This holistic assessment should \nalso include a clinical assessment of the wound. Clinical assessment of wound infection includes \nevaluation of anatomical location and presentation of the wound bed and the periwound region.80",
+        "metadata": {
+          "source": "8-wound-infection-in-clinical-practice-principles-of-best-practices-2022.pdf",
+          "page": 10,
+          "chunk_id": 40
+        }
+      }
+    ]
+  }
+]

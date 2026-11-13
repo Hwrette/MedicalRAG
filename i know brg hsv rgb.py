@@ -1,4 +1,6 @@
+import argparse
 import datetime
+from pathlib import Path
 import os
 import cv2
 import numpy as np
@@ -66,13 +68,12 @@ def calculate_metrics(patch_name, r, g, b):
   return "N/A", 0.0
 
 
-def main():
-  target_image = "KakaoTalk_20261113_192518326_06.png"
+def measure_patches(target_image):
 
-  img_bgr = cv2.imread(target_image)
+  img_bgr = cv2.imread(str(target_image))
   if img_bgr is None:
     print(f"Error: Failed to read image '{target_image}'.")
-    return
+    return None
 
   # 1단계: 화이트 밸런스 및 조명 정규화
   img_wb = apply_white_balance(img_bgr)
@@ -87,9 +88,9 @@ def main():
   temp_box, co2_box, btb_box = get_exact_patch_boxes(img_norm)
 
   patches_to_process = [
-      ("Temperature Patch (TEMP)", temp_box, (0, 255, 0)),
-      ("CO2 Patch (Phenol Red)", co2_box, (0, 0, 255)),
-      ("BTB Patch", btb_box, (255, 0, 0)),
+      ("Temperature Patch (TEMP)", "temperature_value", temp_box, (0, 255, 0)),
+      ("CO2 Patch (Phenol Red)", "co2_value", co2_box, (0, 0, 255)),
+      ("BTB Patch", "ph_value", btb_box, (255, 0, 0)),
   ]
 
   img_raw_vis = img_bgr.copy()
@@ -99,7 +100,8 @@ def main():
   print(f"Precise Patch Analysis for: '{target_image}'")
   print("=" * 75)
 
-  for patch_name, box, color in patches_to_process:
+  measurements = {}
+  for patch_name, field, box, color in patches_to_process:
     x, y, bw, bh = box
 
     # Raw(보정 전) RGB 추출 및 환산
@@ -112,7 +114,9 @@ def main():
         img_norm[y : y + bh, x : x + bw], cv2.COLOR_BGR2RGB
     )
     norm_r, norm_g, norm_b = np.mean(norm_crop, axis=(0, 1))
-    norm_str, _ = calculate_metrics(patch_name, norm_r, norm_g, norm_b)
+    norm_str, value = calculate_metrics(patch_name, norm_r, norm_g, norm_b)
+
+    measurements[field] = float(value)
 
     print(f"🔹 [{patch_name}]")
     print(
@@ -158,6 +162,21 @@ def main():
 
   print(f"📁 Raw result saved to '{raw_output_path}'")
   print(f"📁 Corrected result saved to '{norm_output_path}'")
+
+
+  return measurements
+
+
+def main():
+  parser = argparse.ArgumentParser(description="보정한 세 패치 측정값으로 전문가 시스템과 해설 채팅을 실행합니다.")
+  parser.add_argument("image", type=Path, nargs="?",
+                      default=Path(__file__).with_name("KakaoTalk_20261113_192518326_06.png"))
+  parser.add_argument("--rag", choices=("on", "off"), default="off")
+  args = parser.parse_args()
+  values = measure_patches(args.image)
+  if values is not None:
+    from DressingExpert.chat import main as start_chat
+    start_chat(["--rag", args.rag], patch_values=values)
 
 
 if __name__ == "__main__":

@@ -137,7 +137,7 @@ class Conversation:
             return None
 
 
-def main():
+def main(argv=None, *, patch_values=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--data', type=Path, help='기존 JSON 입력 파일 (지정하면 JSON 입력 모드)')
     modes = parser.add_mutually_exclusive_group()
@@ -149,12 +149,12 @@ def main():
     parser.add_argument('--prompt', type=Path)
     parser.add_argument('--history', type=Path, help='전문가 시스템에 전달할 기존 측정 이력 JSON')
     parser.add_argument('--rag', choices=['on', 'off'], help='생략하면 시작 시 선택')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     load_dotenv(BASE_DIR / '.env')
     log = Transcript(BASE_DIR / 'chat_logs')
 
     try:
-        mode = args.input_mode
+        mode = 'corrected-patches' if patch_values is not None else args.input_mode
         if mode is None and (args.data is not None or args.history is not None):
             mode = 'json'
         if mode is None:
@@ -175,7 +175,11 @@ def main():
             default_prompt = 'prompt_rag.txt'
         else:
             default_prompt = 'prompt.txt'
-            if mode == 'json':
+            if mode == 'corrected-patches':
+                raw = patch_values
+                measurement_history = []
+                image_details = []
+            elif mode == 'json':
                 data_file = args.data or BASE_DIR / 'files' / 'data.json'
                 raw = load_json(data_file)
                 measurement_history = load_json(args.history) if args.history else None
