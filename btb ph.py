@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 
 
-def analyze_exact_indicators():
-  target_image = "KakaoTalk_20261107_150910596_01.png"
+def analyze_all_patches_ph_only():
+  target_image = "KakaoTalk_20261113_175315242.jpg"
 
   img_bgr = cv2.imread(target_image)
   if img_bgr is None:
@@ -12,81 +12,82 @@ def analyze_exact_indicators():
 
   h, w, _ = img_bgr.shape
 
-  # 상단 배경 철망 영역을 제외하고 페트리 디쉬가 있는 하단 영역(ROI) 설정
-  roi_ymin = int(h * 0.3)
-  roi_img = img_bgr[roi_ymin:h, 0:w]
+  # 1. 온도 패치 (상단 좌측)
+  mask_temp = cv2.inRange(
+      cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV), (0, 10, 10), (25, 250, 160)
+  )
 
-  hsv = cv2.cvtColor(roi_img, cv2.COLOR_BGR2HSV)
+  # 2. BTB pH 패치 (하단 중앙)
+  mask_btb = cv2.inRange(
+      cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV), (65, 30, 30), (135, 255, 255)
+  )
 
-  # 1. BTB 지시약 (파란색 계열) 정밀 마스크
-  mask_btb = cv2.inRange(hsv, (95, 50, 50), (130, 255, 255))
+  def get_box_from_mask(mask, x_range, y_range):
+    contours, _ = cv2.findContours(
+        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
+    valid = []
+    for c in contours:
+      area = cv2.contourArea(c)
+      if area < 150:
+        continue
+      x, y, bw, bh = cv2.boundingRect(c)
+      if x_range[0] <= x <= x_range[1] and y_range[0] <= y <= y_range[1]:
+        valid.append((area, x, y, bw, bh))
+    if not valid:
+      return None
+    return max(valid, key=lambda item: item[0])[1:5]
 
-  # 2. 페놀레드 지시약 (노란색/주황색 계열) 정밀 마스크
-  mask_phenol = cv2.inRange(hsv, (15, 60, 60), (35, 255, 255))
+  temp_box = get_box_from_mask(mask_temp, (0, int(w * 0.5)), (0, int(h * 0.5)))
+  btb_box = get_box_from_mask(
+      mask_btb, (int(w * 0.2), int(w * 0.9)), (int(h * 0.4), h)
+  )
 
-  # 3. 온도 패치 (TEMP 갈색/어두운 원형 패치) 정밀 마스크
-  mask_temp = cv2.inRange(hsv, (0, 10, 10), (25, 250, 160))
+  # 3. 페놀레드 패치 (상단 우측 주황색 영역 고정 ROI)
+  phenol_box = (int(w * 0.35), int(h * 0.08), int(w * 0.55), int(h * 0.45))
 
-  patches = [
-      ("BTB pH Patch", mask_btb, (255, 0, 0)),  # 파란색 박스
-      ("Phenol Red CO2 Patch", mask_phenol, (0, 0, 255)),  # 빨간색 박스
-      ("Temperature Patch (TEMP)", mask_temp, (0, 255, 0)),  # 초록색 박스
+  patches_to_process = [
+      ("Temperature Patch (TEMP)", temp_box, (0, 255, 0)),  # 초록색 박스
+      ("Phenol Red pH Patch", phenol_box, (0, 0, 255)),  # 빨간색 박스
+      ("BTB pH Patch", btb_box, (255, 0, 0)),  # 파란색 박스
   ]
 
   print("=" * 65)
   print(f"Target Image Analysis: '{target_image}'")
   print("=" * 65)
 
-  for patch_name, mask, color in patches:
-    kernel = np.ones((5, 5), np.uint8)
-    cleaned = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    cleaned = cv2.morphologyEx(cleaned, cv2.MORPH_CLOSE, kernel)
-
-    contours, _ = cv2.findContours(
-        cleaned, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )
-
-    if not contours:
+  for patch_name, box, color in patches_to_process:
+    if box is None:
       print(f"[{patch_name}] No region detected.")
       continue
 
-    valid_contours = [
-        c for c in contours if 150 < cv2.contourArea(c) < 30000
-    ]
-    if not valid_contours:
-      continue
-
-    best_cnt = max(valid_contours, key=cv2.contourArea)
-    x, y, bw, bh = cv2.boundingRect(best_cnt)
-
-    # 전체 이미지 좌표계로 변환
-    y += roi_ymin
-
+    x, y, bw, bh = box
     crop_bgr = img_bgr[y : y + bh, x : x + bw]
     crop_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
     mean_rgb = np.mean(crop_rgb, axis=(0, 1))
     r, g, b = mean_rgb
 
-    # 수치 환산 로직
-    if "BTB" in patch_name:
+    # 측정값 환산 (모두 온도 및 pH로 출력)
+    if "Temperature" in patch_name:
+      temp_val = 36.5 if g > r else 37.5
+      metric_str = f"Temp: {temp_val}C"
+      print(f"🔹 [{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
+      print(f" -> Measured Temperature: {temp_val:.1f}°C")
+
+    elif "Phenol Red" in patch_name:
+      # 페놀레드 변색 범위(산성~약알칼리성, 보통 pH 6.8 ~ 8.4) 기준으로 RGB 비율 환산
+      ph_val = 6.8 + ((r - g) / 255.0) * 1.6
+      ph_val = min(8.4, max(6.8, ph_val))
+      metric_str = f"pH: {ph_val:.2f}"
+      print(f"🔹 [{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
+      print(f" -> Measured pH Value (Phenol Red): pH {ph_val:.2f}")
+
+    elif "BTB" in patch_name:
       ph_val = 6.0 + ((b - r) / 255.0) * 3.0
       ph_val = min(10.0, max(4.0, ph_val))
       metric_str = f"pH: {ph_val:.2f}"
-      print(f"[{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
-      print(f" -> Measured pH Value: {ph_val:.2f}")
-
-    elif "Phenol" in patch_name:
-      co2_val = 350.0 + (max(0, r - g) * 25.0) + (max(0, r - 100) * 10.0)
-      co2_val = min(5000.0, max(100.0, co2_val))
-      metric_str = f"CO2: {int(co2_val)}ppm"
-      print(f"[{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
-      print(f" -> Measured CO2 Concentration: {co2_val:.1f} ppm")
-
-    else:
-      temp_val = 36.5 if g > r else 37.5
-      metric_str = f"Temp: {temp_val}C"
-      print(f"[{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
-      print(f" -> Measured Temperature: {temp_val:.1f}C[cite: 5]")
+      print(f"🔹 [{patch_name}] x={x}, y={y} | RGB: R={r:.1f}, G={g:.1f}, B={b:.1f}")
+      print(f" -> Measured pH Value (BTB): pH {ph_val:.2f}")
 
     print("-" * 65)
 
@@ -101,10 +102,10 @@ def analyze_exact_indicators():
         2,
     )
 
-  output_file = "corrected_patches_result.jpg"
+  output_file = "all_patches_ph_result.jpg"
   cv2.imwrite(output_file, img_bgr)
   print(f"Result image saved as '{output_file}'.")
 
 
 if __name__ == "__main__":
-  analyze_exact_indicators()
+  analyze_all_patches_ph_only()
