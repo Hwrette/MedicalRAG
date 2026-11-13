@@ -35,9 +35,11 @@ def calculate(series, config):
         if not math.isfinite(score):
             result['risk_status'] = 'numeric_overflow'
         else:
-            level = next((f'band_{i}' for i, bound in enumerate((20, 40, 60, 80, 100)) if score < bound), 'out_of_scale')
+            bounds = (20, 40, 60, 80, 100)
+            classified = next((b for b in bounds if math.isclose(score, b, rel_tol=0, abs_tol=1e-12)), score)
+            level = next((f'band_{i}' for i, b in enumerate(bounds) if classified < b), 'out_of_scale')
             result.update(risk_score=score, risk_level=level, risk_status='calculated')
-    # 두 점이면 D=0은 필연적이므로 안정으로 분류하지 않는다.
+    # 이전 측정 두 개가 있어야 독립적인 기준 기울기를 구할 수 있다.
     if len(series) < 3:
         return result
     # HTML fit(prev): 현재 측정 직전까지의 점만으로 비교 기준을 만든다.

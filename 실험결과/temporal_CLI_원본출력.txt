@@ -758,7 +758,7 @@
 편차 D: -0.1000
 연구용 점수 R: 20.0000
 추세 상태: similar_to_trend
-점수 상태: calculated band_0
+점수 상태: calculated band_1
 
 === 3행 정상 / ph / 1~1일차 ===
 [입력]
@@ -863,7 +863,7 @@
 편차 D: 0.1000
 연구용 점수 R: 20.0000
 추세 상태: similar_to_trend
-점수 상태: calculated band_0
+점수 상태: calculated band_1
 
 === 3행 정상 / ph / 1~7일차 ===
 [입력]
@@ -1139,7 +1139,7 @@
 편차 D: -0.0500
 연구용 점수 R: 20.0000
 추세 상태: similar_to_trend
-점수 상태: calculated band_0
+점수 상태: calculated band_1
 
 === 4행 정상 → 급격한 감염 / ph / 1~1일차 ===
 [입력]
@@ -1184,7 +1184,7 @@
 편차 D: 0.2000
 연구용 점수 R: 20.0000
 추세 상태: similar_to_trend
-점수 상태: calculated band_0
+점수 상태: calculated band_1
 
 === 4행 정상 → 급격한 감염 / ph / 1~4일차 ===
 [입력]
@@ -1438,7 +1438,7 @@
 편차 D: -0.2000
 연구용 점수 R: 20.0000
 추세 상태: similar_to_trend
-점수 상태: calculated band_0
+점수 상태: calculated band_1
 
 === 4행 정상 → 급격한 감염 / co2 / 1~4일차 ===
 [입력]

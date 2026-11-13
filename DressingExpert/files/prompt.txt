@@ -119,7 +119,7 @@ pH와 온도가 모두 시제품의 주의 구간에 들어가서 드레싱 상�
     },
     "facts": {"ph_score_alert": true, "ph_deviation_alert": false},
     "matched_rules": [
-      {"id": "Q01", "phase": "conclusion", "condition": "ph_score_alert or temperature_score_alert", "conclusion": "numeric_score_review", "action": "confirm_measurement"}, "phase": "conclusion", "condition": "ph_deviation_alert or temperature_deviation_alert", "conclusion": "numeric_trend_review", "action": "confirm_measurement"}
+      {"id": "Q01", "phase": "conclusion", "condition": "ph_score_alert or temperature_score_alert", "conclusion": "numeric_score_review", "action": "confirm_measurement"}
     ],
     "fired_rules": ["Q01"],
     "conclusions": ["numeric_score_review"],

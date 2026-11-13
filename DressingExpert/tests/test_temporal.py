@@ -17,6 +17,28 @@ class TemporalTests(unittest.TestCase):
         self.assertAlmostEqual(r['trend_slope'], .2)
         self.assertAlmostEqual(r['slope_deviation'], .3-r['trend_slope'])
 
+    def test_minute_day_equivalence(self):
+        sensors = json.loads((FILES_DIR / 'algorithm_config.json').read_text())['sensors']
+        for key, config in sensors.items():
+            base = 36 if key == 'temperature' else 7
+            minute_bounds = [.2, 1] if key == 'temperature' else [.02, .1]
+            self.assertEqual(config['deviation_bounds'], [v * 1440 for v in minute_bounds])
+            minute_config = {**config, 'beta': config['beta'] * 1440,
+                             'deviation_bounds': minute_bounds}
+            series = [(0, base), (2, base), (5, base), (7, base + .8)]
+            minutes = calculate(series, minute_config)
+            days = calculate([(t / 1440, x) for t, x in series], config)
+            for field in ('recent_slope', 'trend_slope', 'slope_deviation'):
+                self.assertAlmostEqual(days[field], minutes[field] * 1440)
+            self.assertAlmostEqual(days['risk_score'], minutes['risk_score'])
+            for field in ('trend_status', 'risk_level'):
+                self.assertEqual(days[field], minutes[field])
+
+    def test_decimal_score_at_band_boundary(self):
+        result = calculate([(1, 5.9), (2, 6)], CONFIG)
+        self.assertAlmostEqual(result['risk_score'], 20)
+        self.assertEqual(result['risk_level'], 'band_1')
+
     def test_temperature_trend_without_score_weights(self):
         config = json.loads((FILES_DIR / 'algorithm_config.json').read_text())['sensors']['temperature']
         config = {**config, 'alpha': None, 'beta': None}
