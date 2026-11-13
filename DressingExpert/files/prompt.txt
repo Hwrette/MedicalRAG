@@ -53,7 +53,7 @@
 질문: "왜 이런 결론이 나왔어?"
 입력 일부:
 {
-  "expert_input": {"ph_value": 6.8, "temperature_value": 37.2, "co2_value": 800, "measurement_day": 1},
+  "expert_input": {"ph_value": 6.8, "temperature_value": 37.2, "co2_value": 1800, "measurement_day": 1},
   "measurement_history": [],
   "expert_output": {
     "indicator_levels": {"ph_level": "caution", "temperature_level": "caution", "co2_level": "observation"},
@@ -65,7 +65,7 @@
     "matched_rules": [
       {"id": "R03", "phase": "classification", "condition": "ph_valid and (6.5 <= ph_value < 7)", "conclusion": "ph_level=caution"},
       {"id": "R08", "phase": "classification", "condition": "temperature_valid and (37 <= temperature_value < 37.5)", "conclusion": "temperature_level=caution"},
-      {"id": "R12", "phase": "classification", "condition": "co2_valid and (600 <= co2_value < 1000)", "conclusion": "co2_level=observation"},
+      {"id": "R12", "phase": "classification", "condition": "co2_valid and (1500 <= co2_value < 2500)", "conclusion": "co2_level=observation"},
       {"id": "R33", "phase": "individual", "condition": "ph_rank >= 2", "conclusion": "ph_risk_signal"},
       {"id": "R34", "phase": "individual", "condition": "temperature_rank >= 2", "conclusion": "temperature_risk_signal"},
       {"id": "R42", "phase": "combined", "condition": "risk_count == 2 and ph_risk_signal and temperature_risk_signal", "conclusion": "primary_temperature_combination"},
@@ -79,7 +79,7 @@
   }
 }
 답변:
-이번 결과의 대표 평가는 두 지표의 위험 신호가 함께 나타난 조합 신호입니다. 입력된 pH 6.8과 온도 37.2℃는 연구용 규칙상 주의 등급이고, CO₂ 800은 관찰 등급으로 분류됐습니다. 각각 pH가 6.5 이상 7 미만, 온도가 37℃ 이상 37.5℃ 미만, CO₂가 600 이상 1000 미만인 조건에 해당했기 때문입니다(R03·R08·R12).
+이번 결과의 대표 평가는 두 지표의 위험 신호가 함께 나타난 조합 신호입니다. 입력된 pH 6.8과 온도 37.2℃는 연구용 규칙상 주의 등급이고, CO₂ 1800은 관찰 등급으로 분류됐습니다. 각각 pH가 6.5 이상 7 미만, 온도가 37℃ 이상 37.5℃ 미만, CO₂가 1500 이상 2500 미만인 조건에 해당했기 때문입니다(R03·R08·R12).
 
 pH와 온도가 주의 이상이어서 각각 위험 신호가 생겼고(R33·R34), 이 두 신호가 함께 있어 조합 신호가 생성됐습니다(R42). 위험 신호가 있는 지표가 두 개라는 조건에 따라 대표 평가와 관련된 결론이 나왔습니다(R98).
 
