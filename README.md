@@ -144,6 +144,97 @@ Q01/Q02는 세 센서값이 모두 유효할 때 적용하는 임시 보조 규�
 python3 DressingExpert/dressingExpert.py --history DressingExpert/files/demo_history.json
 ```
 
+## 전문가 시스템 전체 결과를 자연어로 해설하는 프롬프트
+
+`chat.py`는 `dressingExpert.run()`이 반환한 **전체 딕셔너리**를
+`payload['expert_output']`에 그대로 담고, `make_system_prompt()`에서
+`json.dumps(payload, ensure_ascii=False, indent=2)`로 직렬화합니다.
+`facts`, `matched_rules`(ID/조건/결론/행동), `fired_rules`,
+`algorithm_results`, `final_assessment` 등도 모두 LLM 시스템 프롬프트로 전달합니다.
+
+`files/prompt.txt`의 퓨샷은 실제 적용 규칙의 **condition → facts 변화/신호 → 대표 평가 → 행동 항목**을 이해하기 쉬운 문장으로 설명하도록 설계되어 있습니다.
+아울러 유효하지 않은 입력, 시간 추세 계산이 불가능한 경우, R/D 보조 경고와
+대표 평가의 차이를 예시로 보여 줍니다.
+퓨샷은 일부 항목만 발췌한 가상 예제이고, **실제 실행의 전체 딕셔너리가 항상 우선**합니다.
+RAG 문헌은 일반 의학 배경 설명용이며 전문가 시스템의 임시 규칙을 검증하지 않습니다.
+
+### 현재 프롬프트 선택과 답변 형식
+
+기본 실행은 `DressingExpert/chat.py`의 `--prompt` 기본값인
+`DressingExpert/files/prompt.txt`를 UTF-8로 읽습니다. 스크립트 위치를 기준으로
+찾으므로 실행 폴더가 달라도 기본 프롬프트는 같습니다. `--prompt 경로`를
+지정하면 해당 파일로 대체하며, 상대 경로는 실행 폴더 기준입니다.
+`prompt_legacy.txt`로 자동 전환하거나 두 파일을 합치는 동작은 없습니다.
+
+`prompt_legacy.txt`는 과거 `humidity/co2/temperature/ph`, `low/medium/high`,
+`pending_rules/missing_facts` 중심의 참고용 프롬프트입니다. 라벨과 행동 목록을
+사용하는 옛 답변 예제가 있어 현재 엔진용 기본 프롬프트로 사용하지 않습니다.
+현재 `prompt.txt`는 `ph_value/temperature_value/co2_value`, 전체 facts와 실행 규칙,
+대표 평가 및 R/D 계산을 설명하며, 답변 예제도 빈 줄로 나눈 한국어 문단입니다.
+
+읽은 프롬프트는 `Conversation`에서 `make_system_prompt()`로 전달되고,
+실행 정책과 전체 입력·출력 JSON이 붙어 Gemini의 `config.system_instruction`에
+들어갑니다. RAG ON/OFF의 시스템 지시사항은 같고, 검색 자료는 ON에서만
+사용자 메시지에 추가됩니다. 답변은 제목, 코드, JSON, 표, 목록 없이 짧은 한국어
+문단으로 작성하고, 필요한 규칙 ID와 문헌 출처는 문장 안에 표시하도록 지시합니다.
+이는 모델에 대한 지시이며, 응답을 강제로 변환하거나 형식을 검증하는 후처리는 없습니다.
+콘솔의 진행 안내·검색 출처 표시와 로그의 원본 JSON은 별도로 유지됩니다.
+
+## 프롬프트와 오류 기록 (안정성 개선)
+
+- `DressingExpert/files/prompt.txt`: **현재 입력 방식**(`ph_value`, `temperature_value`, `co2_value`)과 `algorithm_results`를 사용하는 짧은 퓨샷 예제로 교체했습니다. 실제 `expert_output`은 예제보다 우선합니다.
+- `chat.py`는 검색 자료가 **제공된 경우에만** 문헌 내용을 사용해 출처를 표시합니다. ON/OFF 모드에 같은 시스템 지시사항을 전달하며, ON 모드에서는 검색 청크를 사용자 메시지에 추가합니다. 따라서 ON/OFF에서 바뀌는 것은 검색 문헌 제공 여부입니다.
+- 잘못된 JSON/레이아웃, 전문가 시스템 실행 실패, API 클라이언트 초기화 실패 등으로 실행을 중단할 때도 가능한 범위에서 `DressingExpert/chat_logs/`에 **오류 종류**를 남기고 안내를 출력합니다. 전문가 시스템 실행 이전에 측정 입력 로그를 기록하므로 추론 실패 시 입력값을 확인할 수 있습니다.
+- 이미지 모드에서 OpenCV/NumPy를 찾을 수 없으면 설치가 필요하다는 안내를 출력하고 작업을 종료합니다. 잘못된 이미지 파일은 기존처럼 경로를 다시 입력할 수 있습니다.
+- 테스트는 `python3 -m unittest discover -s DressingExpert/tests -v`로 실행합니다. 실제 Gemini API 호출에는 별도의 API 키와 네트워크 환경이 필요합니다.
+
+## RAG 챗봇: 두 가지 측정 입력 방식 (새 기능)
+
+`chat.py` 실행 시 **직접 수치 입력** 또는 **이미지 입력**을 선택할 수 있습니다.
+여러 측정일의 기록을 시간순으로 입력하면, 마지막 기록을 현재값으로 사용하고
+나머지를 전문가 시스템의 `history`로 전달합니다. pH·온도 회귀 추세는 3회
+이상 유효한 연속 측정값이 있어야 계산됩니다.
+
+프로젝트 루트에서 실행합니다.
+
+```sh
+# 입력 방식을 실행 후 선택하기 (1 직접 수치 / 2 사진 / 3 기존 JSON)
+python3 DressingExpert/chat.py --rag on
+
+# 처음부터 수치를 직접 입력
+python3 DressingExpert/chat.py --input-mode manual --rag on
+
+# 각 날짜의 이미지 파일 경로 입력
+python3 DressingExpert/chat.py --input-mode image --rag on
+
+# 기존 JSON 경로 방식도 유지
+python3 DressingExpert/chat.py --input-mode json --rag on
+python3 DressingExpert/chat.py --data DressingExpert/files/data.json --rag on
+python3 DressingExpert/chat.py --data DressingExpert/files/data.json \
+  --history DressingExpert/files/demo_history.json --rag on
+```
+
+수치 입력에서는 측정 횟수, 측정일, 드레싱 교체 여부를 순서대로 입력한 뒤
+각 날짜의 pH·온도·CO₂ 수치를 입력합니다. 사진 입력에서는 날짜별 JPG/PNG
+파일 경로를 입력합니다. 최초 측정은 **1일 차**로 취급하며 이후 날짜는
+엄격히 증가해야 합니다. 현재 CLI는 정수 일자만 받습니다.
+
+**이미지 분석의 제한:** `files/image_layout.json`의 고정 영역(ROI)을
+사용하므로 사진의 구도가 달라지면 ROI를 조정해야 합니다. 현재 BTB 보정표만
+있고 온도·CO₂ 보정표는 비어 있습니다. 분석할 수 없는 값은 임의로 채우지
+않고 별도의 실측값을 입력할지 묻습니다. 입력을 생략하면 `None`으로 남고
+전문가 시스템은 종합 판단을 보류할 수 있습니다. RGB 보정표의 정확성도
+검증되지 않았으므로 실제 의료 판단에 사용하지 않습니다.
+
+입력한 현재값과 과거 이력, 전문가 시스템의 전체 출력은 기존
+`DressingExpert/chat_logs/`의 대화 기록 파일에 저장됩니다. 이미지 입력은
+이미지 파일 경로·RGB 중앙값·수동 보충 여부도 별도로 기록합니다.
+**이미지 자체는 로그에 복사하지 않으며**, 별도의 측정 이력 파일로
+자동 저장하지는 않습니다. RAG ON/OFF에서도 같은 측정 입력을 사용합니다.
+
+`--input-mode image`에는 OpenCV와 NumPy가 필요합니다. RAG 챗봇 실행에는
+기존 Gemini API 키, LangChain 및 검색 인덱스가 필요합니다.
+
 ## 이미지 입력 연결
 
 ```sh
