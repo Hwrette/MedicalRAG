@@ -3,7 +3,7 @@ import numpy as np
 
 
 def analyze_patches_robustly():
-  target_image = "KakaoTalk_20261113_175315242.jpg"
+  target_image = "KakaoTalk_20261113_192518326_07.png"
 
   img_bgr = cv2.imread(target_image)
   if img_bgr is None:
