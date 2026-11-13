@@ -8,7 +8,7 @@ from DressingExpert.inference import assess, LEVELS, expression_value
 from DressingExpert.dressingExpert import FILES_DIR, load_rules, run
 
 RULES = load_rules(FILES_DIR / 'rules.csv')
-VALUES = [(5.5, 6.2, 6.8, 7.5, 8.5), (36, 36.7, 37.2, 37.7, 38.5), (3000, 1800, 1200, 800, 400)]
+VALUES = [(5.5, 6.2, 6.8, 7.5, 8.5), (36, 36.7, 37.2, 37.7, 38.5), (8.5, 7.5, 6.8, 6.2, 5.5)]
 KEYS = ['ph_value', 'temperature_value', 'co2_value']
 
 
@@ -54,7 +54,7 @@ class InferenceTests(unittest.TestCase):
     def test_exact_boundaries(self):
         cases = [('ph_value', 'ph_level', [(0,0),(6,1),(6.5,2),(7,3),(8,4),(14,4)]),
                  ('temperature_value', 'temperature_level', [(36,0),(36.5,0),(37,2),(37.5,3),(38,4),(40,4)]),
-                 ('co2_value', 'co2_level', [(0,4),(600,3),(1000,2),(1500,1),(2500,0)])]
+                 ('co2_value', 'co2_level', [(0,4),(6,3),(6.5,2),(7,1),(8,0),(14,0)])]
         for field, output, cases in cases:
             for value, level in cases:
                 with self.subTest(field=field, value=value):
@@ -67,7 +67,7 @@ class InferenceTests(unittest.TestCase):
             self.assertIn('ph_high_risk_signal', result['individual_signals'])
             self.assertEqual(result['combined_signals'], [])
             self.assertNotIn('isolated_signal_pattern', result['conclusions'])
-        for key in ('ph_value',):
+        for key in ('ph_value', 'co2_value'):
             for value in (-0.1,14.1):
                 self.assertEqual(evaluate(raw(**{key:value}))['final_assessment'], 'insufficient_evidence')
         self.assertEqual(assess(raw(), RULES)['final_assessment'], 'insufficient_evidence')

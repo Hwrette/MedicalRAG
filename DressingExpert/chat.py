@@ -61,6 +61,8 @@ class Transcript:
 
 def make_system_prompt(prompt, payload, rag):
     """ON/OFF의 시스템 지시사항은 동일하게 두고 검색 문헌만 사용자 메시지에 추가합니다."""
+    if payload is None:
+        return prompt
     return (prompt + '\n\n[현재 실행 정책]\n'
             + '이번 요청에 제공된 참고 자료가 있다면 일반 배경 설명에만 사용하고 정확히 출처를 표시한다.'
             + '\n참고 자료가 없다면 문헌 출처를 지어내지 않는다.'
@@ -88,23 +90,26 @@ class Conversation:
             if rag:
                 if self.store is None:
                     self.store = self.store_loader()
-                # 후속 질문의 대명사 해석을 위해 최근 사용자 질문을 검색어에 포함합니다.
-                previous = [item['parts'][0]['text'] for item in history if item['role'] == 'user'][-2:]
-                output = self.payload['expert_output']
-                query = '\n'.join(previous + [question, json.dumps({
-                    'assessment': output.get('final_assessment'),
-                    'levels': output.get('indicator_levels'),
-                    'actions': output.get('actions'),
-                }, ensure_ascii=False)])
+                query = question
+                if self.payload is not None:
+                    # 후속 질문의 대명사 해석을 위해 최근 사용자 질문을 검색어에 포함합니다.
+                    previous = [item['parts'][0]['text'] for item in history if item['role'] == 'user'][-2:]
+                    output = self.payload['expert_output']
+                    query = '\n'.join(previous + [question, json.dumps({
+                        'assessment': output.get('final_assessment'),
+                        'levels': output.get('indicator_levels'),
+                        'actions': output.get('actions'),
+                    }, ensure_ascii=False)])
                 docs = self.store.similarity_search(query, k=3)
                 self.log.write('검색어', query)
                 self.log.write('검색된 원문과 출처', [
-                    {'text': doc.page_content, 'metadata': doc.metadata} for doc in docs])
+                    {'rank': rank, 'text': doc.page_content, 'metadata': doc.metadata}
+                    for rank, doc in enumerate(docs, 1)])
                 context = '\n\n'.join(
                     f"[출처: {d.metadata.get('source', '미상')}, PDF {d.metadata.get('page', '?')}쪽]\n{d.page_content}"
                     for d in docs)
-                for d in docs:
-                    print(f"  근거: {d.metadata.get('source')} / PDF {d.metadata.get('page')}쪽")
+                for rank, d in enumerate(docs, 1):
+                    print(f"  {rank}위 · 청크 {d.metadata.get('chunk_id', '미확인')} · 근거: {d.metadata.get('source')} / PDF {d.metadata.get('page')}쪽")
             system = make_system_prompt(self.prompt, self.payload, rag)
             user_text = question + ('\n\n[이번 질문의 참고 자료]\n' + (context or '검색 결과 없음') if rag else '')
             message = {'role': 'user', 'parts': [{'text': user_text}]}
@@ -135,10 +140,13 @@ class Conversation:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--data', type=Path, help='기존 JSON 입력 파일 (지정하면 JSON 입력 모드)')
-    parser.add_argument('--input-mode', choices=['image', 'manual', 'json'],
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--rag-only', dest='input_mode', action='store_const', const='rag-only',
+                       help='측정값 없이 문헌에 질문하고 RAG ON/OFF 비교')
+    modes.add_argument('--input-mode', choices=['image', 'manual', 'json', 'rag-only'],
                         help='사진/직접 수치/기존 JSON 파일 입력 방식')
     parser.add_argument('--layout', type=Path, help='사진 분석 영역 및 RGB 보정표 JSON 경로')
-    parser.add_argument('--prompt', type=Path, default=BASE_DIR / 'files' / 'prompt.txt')
+    parser.add_argument('--prompt', type=Path)
     parser.add_argument('--history', type=Path, help='전문가 시스템에 전달할 기존 측정 이력 JSON')
     parser.add_argument('--rag', choices=['on', 'off'], help='생략하면 시작 시 선택')
     args = parser.parse_args()
@@ -151,41 +159,48 @@ def main():
             mode = 'json'
         if mode is None:
             while mode is None:
-                choice = input('입력 방식 [1: 직접 수치, 2: 사진, 3: 기존 JSON 파일]: ').strip()
-                mode = {'1': 'manual', '2': 'image', '3': 'json'}.get(choice)
+                choice = input('입력 방식 [1: 직접 수치, 2: 사진, 3: 기존 JSON 파일, 4: RAG 단독]: ').strip()
+                mode = {'1': 'manual', '2': 'image', '3': 'json', '4': 'rag-only'}.get(choice)
                 if mode is None:
-                    print('1, 2 또는 3을 입력해 주세요.')
+                    print('1~4 중 하나를 입력해 주세요.')
 
         if mode != 'json' and (args.data is not None or args.history is not None):
             parser.error('--data와 --history는 JSON 모드에서만 사용합니다.')
         if mode != 'image' and args.layout is not None:
             parser.error('--layout은 이미지 모드에서만 사용합니다.')
 
-        if mode == 'json':
-            data_file = args.data or BASE_DIR / 'files' / 'data.json'
-            raw = load_json(data_file)
-            measurement_history = load_json(args.history) if args.history else None
-            image_details = []
+        prompt_path = args.prompt
+        if mode == 'rag-only':
+            payload = None
+            default_prompt = 'prompt_rag.txt'
         else:
-            raw, measurement_history, image_details = collect_measurements(
-                mode, layout_path=args.layout
-            )
+            default_prompt = 'prompt.txt'
+            if mode == 'json':
+                data_file = args.data or BASE_DIR / 'files' / 'data.json'
+                raw = load_json(data_file)
+                measurement_history = load_json(args.history) if args.history else None
+                image_details = []
+            else:
+                raw, measurement_history, image_details = collect_measurements(
+                    mode, layout_path=args.layout
+                )
 
-        # 전문가 시스템 실행에 실패해도 입력값과 실패 사유가 로그에 남도록 먼저 기록합니다.
-        log.write('입력 방식과 측정값', {
-            'mode': mode, 'expert_input': raw,
-            'measurement_history': measurement_history,
-        })
-        if image_details:
-            log.write('이미지 분석 결과와 수동 보충 내역', image_details)
-        expert_output = run(raw=raw, history=measurement_history)
-        payload = {
-            'schema_version': '2.0',
-            'expert_input': raw,
-            'measurement_history': measurement_history,
-            'expert_output': expert_output,
-        }
-        prompt = args.prompt.read_text(encoding='utf-8')
+            # 전문가 시스템 실행에 실패해도 입력값과 실패 사유가 로그에 남도록 먼저 기록합니다.
+            log.write('입력 방식과 측정값', {
+                'mode': mode, 'expert_input': raw,
+                'measurement_history': measurement_history,
+            })
+            if image_details:
+                log.write('이미지 분석 결과와 수동 보충 내역', image_details)
+            expert_output = run(raw=raw, history=measurement_history)
+            payload = {
+                'schema_version': '2.0',
+                'expert_input': raw,
+                'measurement_history': measurement_history,
+                'expert_output': expert_output,
+            }
+        prompt_path = prompt_path or BASE_DIR / 'files' / default_prompt
+        prompt = prompt_path.read_text(encoding='utf-8')
 
     except (KeyboardInterrupt, EOFError):
         log.write('입력 취소', '사용자가 입력을 중단했습니다.')
@@ -205,16 +220,17 @@ def main():
     model = os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
     log.write('세션 설정', {'model': model, 'input_mode': mode,
                           'data_file': str(data_file) if mode == 'json' else None,
-                          'prompt_file': str(args.prompt),
+                          'prompt_file': str(prompt_path),
                           'embedding_model': 'models/gemini-embedding-001', 'k': 3})
-    log.write('사용한 퓨샷 프롬프트 전체', prompt)
-    log.write('실제 전문가 시스템 입력·출력', payload)
+    log.write('문헌 질의 프롬프트' if payload is None else '사용한 퓨샷 프롬프트 전체', prompt)
+    if payload is not None:
+        log.write('실제 전문가 시스템 입력·출력', payload)
     print('대화 기록:', log.path)
     print('명령: /rag on | /rag off | /비교 질문 | /초기화 | /종료 (또는 종료)')
     print('ON/OFF 대화는 별도로 기억합니다. /비교는 이력 없이 같은 질문을 양쪽에 보냅니다.')
     client = None
     try:
-        selection = args.rag
+        selection = args.rag or ('on' if mode == 'rag-only' else None)
         while selection not in ('on', 'off'):
             selection = input('시작 모드 [on/off, 종료]: ').strip().lower()
             log.write('시작 모드 선택', selection)
@@ -226,11 +242,23 @@ def main():
 
         def load_store():
             embeddings = GoogleGenerativeAIEmbeddings(model='models/gemini-embedding-001')
-            return InMemoryVectorStore.load(str(BASE_DIR / 'RAGtexts' / 'index' / 'wounds.json'),
-                                           embedding=embeddings)
+            store = InMemoryVectorStore.load(str(BASE_DIR / 'RAGtexts' / 'index' / 'wounds.json'),
+                                             embedding=embeddings)
+            # 기존 인덱스는 UUID만 저장했다. 페이지·본문까지 일치하는 원본 청크 ID를 복원한다.
+            if any('chunk_id' not in entry['metadata'] for entry in store.store.values()):
+                chunks = json.loads((BASE_DIR / 'RAGtexts' / 'chunks.json').read_text(encoding='utf-8'))
+                ids = {(c['metadata']['source'], c['metadata']['page'], c['text']): c['id'] for c in chunks}
+                for entry in store.store.values():
+                    meta = entry['metadata']
+                    key = (meta['source'], meta['page'], entry['text'])
+                    if key in ids:
+                        meta.setdefault('chunk_id', ids[key])
+            return store
 
         chat = Conversation(client, model, prompt, payload, log, load_store)
-        chat.answer('이번 전문가 시스템의 입력과 출력 결과를 쉽게 설명해 주세요.', rag)
+        if payload is not None:
+            chat.answer('제가 입력한 측정일과 각 측정값, 이전 기록과 교체 여부를 먼저 쉬운 말로 들려주세요. '
+                        '이어서 이번 결과가 왜 나왔고 어떤 행동이 제안됐는지 설명해 주세요.', rag)
         while True:
             question = input(f'\n[RAG {"ON" if rag else "OFF"}] 나: ').strip()
             if not question:

@@ -1,0 +1,155 @@
+환자 질문으로 평가하는 의료 문헌 RAG
+
+질문만 ON·OFF에 동일하게 입력한다. 영어 근거와 번역은 채점할 때 사용한다. 아래 ID는 chunks.json 기준이며, 각 쪽수는 저장된 PDF의 페이지 순서다.
+
+문항 1  수분 균형
+
+오래 안 낫는 상처인데, 드레싱을 떼고 바람에 좀 말리면 더 빨리 낫나요?
+
+기준 청크 280  ·  PDF 10쪽
+Chronic_Wounds_Evaluation_and_Management_AFP.pdf
+
+답의 근거가 되는 영어 원문 발췌
+
+Moisture balance is an essential part of wound care. Chronic wounds should never be exposed to air to “dry out,” as is often recommended. Moist wounds heal more quickly and have less risk of infection. If a wound appears dry, moisture needs to be added; this is accomplished by choosing an appropriate dressing (Table 3). Conversely, if a wound is draining, the drainage needs to be controlled and kept off of the periwound. The proper dressing should hold the moisture on the wound bed to prevent desiccation.
+
+한국어 번역
+
+수분 균형은 상처 관리의 중요한 요소다. 흔히 말하는 것처럼 만성 상처를 공기에 노출해 말려서는 안 된다. 습윤 상태의 상처는 더 빨리 낫고 감염 위험도 더 낮다. 상처가 건조해 보이면 적절한 드레싱을 선택해 수분을 공급해야 한다. 반대로 진물이 나오면 배액을 조절해 상처 주변 피부에 닿지 않게 해야 한다. 적절한 드레싱은 상처 바닥의 수분을 유지해 마르는 것을 막는다.
+
+답변을 대조할 때
+
+만성 상처에서 수분을 유지하는 이유와 진물이 주변 피부에 고이지 않도록 관리하는 이유를 구분하는지 본다. “축축할수록 좋다”거나 환자가 사용할 특정 제품까지 단정하면 범위를 벗어난다.
+
+실험 기록
+
+검색된 청크 또는 파일·쪽수   ________________________________
+OFF 답변의 핵심 주장   ______________________________________
+ON 답변에서 근거가 지지하거나 지지하지 않는 주장   ______________
+
+문항 2  진물과 측정 방법
+
+드레싱을 바꾼 뒤에 진물이 전보다 많이 모였대요. 그럼 상처가 더 나빠진 건가요?
+
+기준 청크 487  ·  PDF 12쪽
+nihms-2086081.pdf
+
+답의 근거가 되는 영어 원문 발췌
+
+The methods used for measuring wound exudate can yield disparate results. A comparative study of 14 patients revealed significant differences in exudate collection between methods: 0.17–0.21 g cm−2 day−1 with dressing and 1.3 g cm−2 day−1 with NPWT109. The inconsistencies in wound analysis methods and sample collection pose a crucial challenge, hindering accurate characterization of the wound healing process and impeding effective results comparison across studies.
+
+한국어 번역
+
+상처 삼출물(진물)은 측정 방법에 따라 결과가 달라질 수 있다. 환자 14명을 대상으로 한 비교 연구에서 드레싱으로 모은 양은 하루에 1 cm²당 0.17~0.21 g, 음압상처치료(NPWT)로 모은 양은 1.3 g으로 차이가 컸다. 상처 분석 및 검체 수집 방법이 일관되지 않으면 치유 과정을 정확히 파악하고 연구 결과를 서로 비교하기 어렵다.
+
+답변을 대조할 때
+
+방법이 달라지면 수집량도 달라질 수 있다는 설명이 핵심이다. 수치는 필수 답변 요소가 아니지만, 인용한다면 두 방법과 단위가 맞아야 한다. 이 환자의 변경 전후 드레싱이 연구의 두 방법과 같다고 가정하지 않는다.
+
+실험 기록
+
+검색된 청크 또는 파일·쪽수   ________________________________
+OFF 답변의 핵심 주장   ______________________________________
+ON 답변에서 근거가 지지하거나 지지하지 않는 주장   ______________
+
+문항 3  전형적인 징후가 없는 경우
+
+상처가 몇 주째 잘 안 낫는데, 열도 안 나고 빨갛지도 않아요. 그러면 감염 걱정은 안 해도 되나요?
+
+기준 청크 275  ·  PDF 8쪽
+Chronic_Wounds_Evaluation_and_Management_AFP.pdf
+
+답의 근거가 되는 영어 원문 발췌
+
+When assessing a chronic wound for infection, physicians should be aware that chronic infected wounds have different signs and symptoms than acute infected wounds. Typical signs of infection such as erythema, edema, pain, and fever are not always present.
+
+한국어 번역
+
+만성 상처의 감염을 평가할 때는 감염된 만성 상처의 징후와 증상이 급성 상처와 다를 수 있다는 점에 유의해야 한다. 붉어짐, 부종, 통증, 발열과 같은 전형적인 감염 징후가 항상 나타나는 것은 아니다.
+
+답변을 대조할 때
+
+발열이나 붉어짐이 없다는 정보만으로 감염을 배제할 수 없다고 설명하는지 본다. 오래 낫지 않았다는 말만으로 감염을 확정하는 답변도 근거가 부족하다.
+
+실험 기록
+
+검색된 청크 또는 파일·쪽수   ________________________________
+OFF 답변의 핵심 주장   ______________________________________
+ON 답변에서 근거가 지지하거나 지지하지 않는 주장   ______________
+
+문항 4  통증과 냄새의 변화
+
+상처에서 나던 냄새가 더 심해졌고 전보다 아파요. 병원에 이 두 가지도 얘기해야 하나요?
+
+기준 청크 38  ·  PDF 10쪽
+8-wound-infection-in-clinical-practice-principles-of-best-practices-2022.pdf
+
+답의 근거가 되는 영어 원문 발췌
+
+Overt (classic) signs and symptoms of wound infection may include:62, 67-69, 71 ■ Erythema (which may present differently depending on the individual’s skin tone) ■ Local warmth ■ Swelling ■ Purulent discharge ■ Wound breakdown and enlargement ■ New or increasing pain ■ Increasing malodour.
+
+한국어 번역
+
+상처 감염에서 뚜렷하게 나타날 수 있는 전형적인 징후와 증상에는 피부색에 따라 다르게 보일 수 있는 붉어짐, 국소 열감, 부기, 고름성 분비물, 상처가 벌어지거나 커짐, 새로 생기거나 심해지는 통증, 심해지는 악취가 포함된다.
+
+답변을 대조할 때
+
+의료진에게 두 변화를 함께 알릴 만한 이유를 설명하는지 본다. 문헌의 표현은 “나타날 수 있다”이며, 두 변화만으로 이 환자가 감염됐다고 결론 내릴 수는 없다.
+
+실험 기록
+
+검색된 청크 또는 파일·쪽수   ________________________________
+OFF 답변의 핵심 주장   ______________________________________
+ON 답변에서 근거가 지지하거나 지지하지 않는 주장   ______________
+
+문항 5  아문 피부의 강도
+
+상처가 아문 지 석 달쯤 됐는데, 그 자리 피부도 이제 예전만큼 튼튼해졌나요?
+
+기준 청크 319  ·  PDF 5쪽
+Physiology, Wound Healing - StatPearls - NCBI Bookshelf.pdf
+
+답의 근거가 되는 영어 원문 발췌
+
+For instance, the wound strength can never catch up with the normal skin strength. At 3 months and beyond, the wound strength reaches only about 80% of that of the original tissue.[10]
+
+한국어 번역
+
+예를 들어, 치유된 상처 조직의 강도는 정상 피부의 강도에 이르지 못한다. 3개월 이후에도 상처 조직의 강도는 원래 조직의 약 80%에 이른다.
+
+답변을 대조할 때
+
+약 80%가 문헌의 일반적인 조직 강도 설명임을 확인한다. 원문 발췌에는 시점의 기산점이 명시되지 않으므로 “상처가 닫힌 날부터 정확히 석 달”로 좁히거나, 개인의 피부 강도를 80%로 확정하지 않는다.
+
+실험 기록
+
+검색된 청크 또는 파일·쪽수   ________________________________
+OFF 답변의 핵심 주장   ______________________________________
+ON 답변에서 근거가 지지하거나 지지하지 않는 주장   ______________
+
+문항 6  스마트 드레싱의 pH 판독
+
+스마트 드레싱에 pH 수치가 뜨던데, 그 숫자 하나만 보고 제가 감염됐는지 알 수 있나요?
+
+기준 청크 481  ·  PDF 11쪽
+nihms-2086081.pdf
+
+답의 근거가 되는 영어 원문 발췌
+
+Emerging biosensors and imaging devices have shown promising capabilities to characterize wound features and monitor versatile biomolecules including metabolites (such as glucose, uric acid, and lactate), electrolytes (such as pH, Na+, Ca2+, and NH4+), nutrients (such as vitamins, amino acids, and fatty acids), proteins (such as cytokines and C-reactive protein), and therapeutic drugs (such as growth factors, plasmids, and antibiotics)85, 94–100. These biomarkers are associated with physiological and pathological conditions, such as infection and inflammation101–103.
+
+한국어 번역
+
+새로운 바이오센서와 영상 장치는 상처의 특성을 파악하고 다양한 생체분자를 관찰할 가능성을 보여 주었다. 예로는 포도당·요산·젖산과 같은 대사산물, pH 및 Na⁺·Ca²⁺·NH₄⁺ 같은 전해질 관련 지표, 비타민·아미노산·무기질과 같은 영양소, 사이토카인·C반응성 단백질과 같은 단백질, 성장인자·항생제와 같은 치료 물질이 있다. 이러한 생체 지표는 감염이나 염증과 같은 생리적·병리적 상태와 관련되어 있다.
+
+답변을 대조할 때
+
+pH는 관찰할 수 있는 여러 지표 중 하나다. 이 발췌가 뒷받침하는 범위는 지표와 상태의 관련성까지다. 우리 장치의 진단 임계값, 개인별 감염 확률 또는 확진 기준을 제시하면 근거 밖 주장으로 기록한다.
+
+실험 기록
+
+검색된 청크 또는 파일·쪽수   ________________________________
+OFF 답변의 핵심 주장   ______________________________________
+ON 답변에서 근거가 지지하거나 지지하지 않는 주장   ______________
+
+채점 시 같은 주장을 지지하는 다른 청크도 인정한다. OFF는 기준 근거와 내용이 일치하는지, ON은 실제로 받은 문단이 답변을 뒷받침하는지도 함께 확인한다.

@@ -8,9 +8,9 @@ from pathlib import Path
 
 
 FIELDS = (
-    ('ph_value', 'pH', 0.0, 14.0),
+    ('ph_value', 'BTB 패치 pH', 0.0, 14.0),
     ('temperature_value', '온도(°C)', None, None),
-    ('co2_value', 'CO₂(ppm)', 0.0, None),
+    ('co2_value', '페놀레드 패치 pH (CO₂ 지표)', 0.0, 14.0),
 )
 
 

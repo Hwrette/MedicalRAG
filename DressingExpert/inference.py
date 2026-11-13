@@ -75,7 +75,7 @@ def initial_facts(raw, rules, temperature_range):
             facts[key] = None if sep else False
     for name, key in INDICATORS.items():
         value = raw.get(key)
-        limits = temperature_range if name == 'temperature' else ((0, float('inf')) if name == 'co2' else (0, 14))
+        limits = temperature_range if name == 'temperature' else (0, 14)
         valid = finite_number(value) and limits is not None and limits[0] <= value <= limits[1]
         facts[key] = value if valid else None
         facts[name + '_valid'] = valid
@@ -192,7 +192,10 @@ def assess(raw, rules, history=None, temperature_range=None, algorithm_config=No
         else:
             from temporal import derive
         algorithm_results = derive(raw, history or [], algorithm_config, temperature_range)
+        # Q01/Q02는 기존 정의대로 BTB pH와 온도 결과에만 적용한다.
         for sensor, values in algorithm_results.items():
+            if sensor not in ('ph', 'temperature'):
+                continue
             facts[sensor + '_score_alert'] = values['risk_level'] in ('band_3', 'band_4', 'out_of_scale', 'limit_exceeded')
             facts[sensor + '_deviation_alert'] = values['trend_status'] == 'rapid_increase'
     for phase in PHASES:

@@ -17,9 +17,9 @@ class InputModeTests(unittest.TestCase):
     def test_manual_three_days_reaches_temporal_analysis(self):
         answers = [
             '3',
-            'n', '6.2', '37.0', '500',
-            '2', 'n', '6.4', '37.2', '700',
-            '3', 'n', '6.8', '37.4', '900',
+            'n', '6.2', '37.0', '5.8',
+            '2', 'n', '6.4', '37.2', '6.1',
+            '3', 'n', '6.8', '37.4', '6.4',
         ]
         raw, history, details = collect_measurements(
             'manual', input_fn=scripted_input(answers), output_fn=lambda _: None
@@ -36,8 +36,8 @@ class InputModeTests(unittest.TestCase):
     def test_manual_skipped_days_and_dressing_change(self):
         answers = [
             '2',
-            'n', '6.2', '37', '500',
-            '5', 'y', '6.5', '37.5', '700',
+            'n', '6.2', '37', '5.8',
+            '5', 'y', '6.5', '37.5', '6.1',
         ]
         raw, history, _ = collect_measurements(
             'manual', input_fn=scripted_input(answers), output_fn=lambda _: None
@@ -50,8 +50,8 @@ class InputModeTests(unittest.TestCase):
     def test_reject_duplicate_day_and_non_finite_manual_values(self):
         answers = [
             '2',
-            'n', 'nan', '6.5', '36.8', '500',
-            '1', '2', 'n', 'inf', '6.8', '37.0', '700',
+            'n', 'nan', '6.5', '36.8', '5.8',
+            '1', '2', 'n', 'inf', '6.8', '37.0', '6.1',
         ]
         messages = []
         raw, history, _ = collect_measurements(
@@ -104,11 +104,11 @@ class InputModeTests(unittest.TestCase):
             with patch('DressingExpert.input_modes._read_image', return_value=image_result):
                 raw, _, details = collect_measurements(
                     'image',
-                    input_fn=scripted_input(['1', 'n', str(image_path), '37.2', '800']),
+                    input_fn=scripted_input(['1', 'n', str(image_path), '37.2', '6.2']),
                     output_fn=lambda _: None,
                 )
         self.assertEqual(raw['temperature_value'], 37.2)
-        self.assertEqual(raw['co2_value'], 800)
+        self.assertEqual(raw['co2_value'], 6.2)
         self.assertEqual(set(details[0]['manual_fallback_fields']),
                          {'temperature_value', 'co2_value'})
 

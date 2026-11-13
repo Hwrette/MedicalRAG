@@ -82,7 +82,7 @@
   {
     "id": "R11",
     "phase": "classification",
-    "condition": "co2_valid and (co2_value >= 2500)",
+    "condition": "co2_valid and (8 <= co2_value <= 14)",
     "conclusion": "co2_level=normal",
     "group": "levels",
     "action": ""
@@ -90,7 +90,7 @@
   {
     "id": "R12",
     "phase": "classification",
-    "condition": "co2_valid and (1500 <= co2_value < 2500)",
+    "condition": "co2_valid and (7 <= co2_value < 8)",
     "conclusion": "co2_level=observation",
     "group": "levels",
     "action": ""
@@ -98,7 +98,7 @@
   {
     "id": "R13",
     "phase": "classification",
-    "condition": "co2_valid and (1000 <= co2_value < 1500)",
+    "condition": "co2_valid and (6.5 <= co2_value < 7)",
     "conclusion": "co2_level=caution",
     "group": "levels",
     "action": ""
@@ -106,7 +106,7 @@
   {
     "id": "R14",
     "phase": "classification",
-    "condition": "co2_valid and (600 <= co2_value < 1000)",
+    "condition": "co2_valid and (6 <= co2_value < 6.5)",
     "conclusion": "co2_level=infection_risk",
     "group": "levels",
     "action": ""
@@ -114,7 +114,7 @@
   {
     "id": "R15",
     "phase": "classification",
-    "condition": "co2_valid and (co2_value < 600)",
+    "condition": "co2_valid and (0 <= co2_value < 6)",
     "conclusion": "co2_level=high_risk",
     "group": "levels",
     "action": ""

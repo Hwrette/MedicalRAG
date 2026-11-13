@@ -35,7 +35,7 @@ def validate_layout(layout):
             if (not isinstance(rgb, list) or len(rgb) != 3
                     or not all(number(x) and 0 <= x <= 255 for x in rgb) or not number(value)):
                 raise ValueError(f'{name}: 보정점에는 rgb 숫자 3개와 유한한 value가 필요합니다.')
-            if name == 'btb' and not 0 <= value <= 14:
+            if name in ('btb', 'phenol_red') and not 0 <= value <= 14:
                 raise ValueError(f'{name}: pH 보정값은 0~14여야 합니다.')
             if tuple(rgb) in seen:
                 raise ValueError(f'{name}: 중복 RGB 보정점입니다.')

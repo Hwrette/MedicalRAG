@@ -72,6 +72,9 @@ if __name__ == "__main__":
 
     output_path = SOURCE_DIR.parent / "chunks.json"
 
+    for chunk_id, chunk in enumerate(chunks, start=1):
+        chunk.metadata["chunk_id"] = chunk_id
+
     chunk_data = [
         {
             "id": index,

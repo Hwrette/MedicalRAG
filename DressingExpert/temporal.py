@@ -18,29 +18,40 @@ def calculate(series, config):
         return {**result, 'status': 'invalid_measurement', 'risk_status': 'invalid_measurement'}
     if any(b[0] <= a[0] for a, b in zip(series, series[1:])):
         return {**result, 'status': 'invalid_time_order', 'risk_status': 'invalid_time_order'}
-    window = config['window']
-    if type(window) is not int or window < 3:
-        raise ValueError('회귀 window는 3 이상의 정수여야 합니다.')
-    points = series[-window:]
-    t, x = points[-1]
-    previous_t, previous_x = points[-2]
+    t, x = series[-1]
+    previous_t, previous_x = series[-2]
     slope = (x - previous_x) / (t - previous_t)
     result['recent_slope'] = slope
     alpha, beta, limit = (config[k] for k in ('alpha', 'beta', 'x_limit'))
-    if not all(finite(v) for v in (alpha, beta, limit)):
+    direction = -1 if config.get('lower_is_risk', False) else 1
+    if alpha is None and beta is None:
+        result['risk_status'] = 'weights_unset'
+    elif not all(finite(v) for v in (alpha, beta, limit)):
         raise ValueError('알고리즘 계수는 유한 숫자여야 합니다.')
-    if x >= limit:
+    elif direction * (limit - x) <= 0:
         result.update(risk_status='limit_reached_or_exceeded', risk_level='limit_exceeded')
     else:
-        score = alpha / (limit - x) + beta * slope
+        score = alpha / (direction * (limit - x)) + beta * direction * slope
         if not math.isfinite(score):
             result['risk_status'] = 'numeric_overflow'
         else:
             level = next((f'band_{i}' for i, bound in enumerate((20, 40, 60, 80, 100)) if score < bound), 'out_of_scale')
             result.update(risk_score=score, risk_level=level, risk_status='calculated')
     # 두 점이면 D=0은 필연적이므로 안정으로 분류하지 않는다.
-    if len(points) < 3:
+    if len(series) < 3:
         return result
+    # HTML fit(prev): 현재 측정 직전까지의 점만으로 비교 기준을 만든다.
+    if 'previous_points' in config:
+        count = config['previous_points']
+        if type(count) is not int or count < 2:
+            raise ValueError('previous_points는 2 이상의 정수여야 합니다.')
+        points = series[-count - 1:-1]
+    else:
+        # 예전 사용자 지정 설정은 당시의 현재점 포함 window 의미를 보존한다.
+        window = config['window']
+        if type(window) is not int or window < 3:
+            raise ValueError('window는 3 이상의 정수여야 합니다.')
+        points = series[-window:]
     times = [p[0] - points[0][0] for p in points]
     mean_t = sum(times) / len(points)
     mean_x = sum(p[1] for p in points) / len(points)
@@ -49,10 +60,13 @@ def calculate(series, config):
     low, high = config['deviation_bounds']
     if not (finite(low) and finite(high) and 0 < low < high):
         raise ValueError('편차 경계값은 0 < low < high여야 합니다.')
-    status = ('rapid_decrease' if deviation < -high else
-              'slight_decrease' if deviation < -low else
-              'similar_to_trend' if deviation <= low else
-              'slight_increase' if deviation <= high else 'rapid_increase')
+    # 십진 경계와의 부동소수점 오차만 흡수해 경계 포함 규칙을 지킨다.
+    classified = next((v for v in (-high, -low, low, high)
+                       if math.isclose(deviation, v, rel_tol=0, abs_tol=1e-12)), deviation)
+    status = ('rapid_decrease' if classified < -high else
+              'slight_decrease' if classified < -low else
+              'similar_to_trend' if classified <= low else
+              'slight_increase' if classified <= high else 'rapid_increase')
     result.update(trend_slope=trend, slope_deviation=deviation, trend_status=status, status='calculated')
     return result
 
@@ -67,7 +81,7 @@ def derive(raw, history, config, temperature_range):
             value = item.get(sensor + '_value')
             day = item.get('measurement_day', item.get('day_since_start'))
             valid = finite(value) and finite(day) and day >= 1
-            if sensor == 'ph':
+            if sensor in ('ph', 'co2'):
                 valid = valid and 0 <= value <= 14
             elif sensor == 'temperature':
                 valid = valid and temperature_range is not None and temperature_range[0] <= value <= temperature_range[1]
@@ -83,11 +97,11 @@ def main():
     files = Path(__file__).resolve().parent / 'files'
     config = json.loads((files / 'algorithm_config.json').read_text(encoding='utf-8'))
     sensor_config = json.loads((files / 'sensor_config.json').read_text(encoding='utf-8'))
-    choice = input('지표 선택 [1: pH, 2: 온도]: ').strip()
-    while choice not in ('1', '2'):
-        choice = input('1 또는 2를 입력하세요: ').strip()
-    sensor = 'ph' if choice == '1' else 'temperature'
-    low, high = (0, 14) if sensor == 'ph' else sensor_config['temperature_range']
+    choice = input('지표 선택 [1: BTB pH, 2: 온도패치, 3: 페놀레드 pH(CO₂ 지표)]: ').strip()
+    while choice not in ('1', '2', '3'):
+        choice = input('1, 2 또는 3을 입력하세요: ').strip()
+    sensor = {'1': 'ph', '2': 'temperature', '3': 'co2'}[choice]
+    low, high = (0, 14) if sensor != 'temperature' else sensor_config['temperature_range']
     while True:
         try:
             count = int(input('며칠치 측정값을 입력할까요? '))
@@ -96,7 +110,7 @@ def main():
         except ValueError:
             pass
         print('1 이상의 정수를 입력하세요.')
-    print(f'측정일과 값({low}~{high})을 한 줄씩 입력하세요. 예: 1 {6.2 if sensor == "ph" else 37.2}')
+    print(f'측정일과 값({low}~{high})을 한 줄씩 입력하세요. 예: 1 {6.2 if sensor != "temperature" else 37.2}')
     print('최근 변화율은 2회, 회귀 기울기와 D는 3회부터 계산됩니다.')
     series = []
     while len(series) < count:
@@ -116,13 +130,19 @@ def main():
     if len(series) < 2:
         print('계산하려면 측정값이 두 개 이상 필요합니다.')
         return
-    result = calculate(series, config['sensors'][sensor])
+    settings = config['sensors'][sensor]
+    result = calculate(series, settings)
+    if settings.get('weight_basis') and result['risk_status'] != 'weights_unset':
+        print('R 가중치 설정 근거:', settings['weight_basis'])
     for key, label in [('recent_slope', '최근 변화율'), ('trend_slope', '회귀 기울기'),
                        ('slope_deviation', '편차 D'), ('risk_score', '연구용 점수 R')]:
         value = result[key]
         print(f'{label}: {value:.4f}' if value is not None else f'{label}: 계산 보류')
     print('추세 상태:', result['trend_status'] or result['status'])
-    print('점수 상태:', result['risk_status'], result['risk_level'] or '')
+    if result['risk_status'] == 'weights_unset':
+        print('점수 상태: R 가중치가 정해지지 않아 점수와 등급을 계산하지 않았습니다.')
+    else:
+        print('점수 상태:', result['risk_status'], result['risk_level'] or '')
 
 
 if __name__ == '__main__':

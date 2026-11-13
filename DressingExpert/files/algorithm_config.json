@@ -1,28 +1,43 @@
 {
   "mode": "simulation",
-  "note": "CO2 경계 600/1000/1500/2500 ppm, 온도 R 계수, 회귀 최근 7회 및 Q01/Q02는 동작 확인용 임시 정책. 임상 검증 없음. R 구간은 감염 확률이나 확진을 의미하지 않음.",
-  "co2_unit": "ppm",
+  "note": "페놀레드 패치 pH 경계 6/6.5/7/8, 현재점 제외 이전 최대 3회 회귀 및 Q01/Q02는 동작 확인용 임시 정책. 온도 R 계수는 점수 구간 비교용으로 정한 실험값. 임상 검증 없음. R 구간은 감염 확률이나 확진을 의미하지 않음.",
+  "co2_input": "페놀레드 패치 pH (CO₂ 간접 지표)",
   "time_unit": "day",
   "sensors": {
     "ph": {
       "alpha": 40,
-      "beta": 500,
+      "beta": 40,
       "x_limit": 8.5,
-      "window": 7,
       "deviation_bounds": [
-        0.018,
-        0.03
-      ]
+        28.8,
+        144
+      ],
+      "previous_points": 3,
+      "weight_basis": "하루 0.5 pH의 경고 방향 변화에 20점 가산하는 일 단위 시뮬레이션 가정. HTML에는 R이 없음."
     },
     "temperature": {
-      "alpha": 10,
-      "beta": 20,
+      "alpha": 40,
+      "beta": 40,
+      "weight_basis": "시뮬레이션 설계점: 현재 38℃, 변화율 0℃/일이면 R=20, 같은 온도에서 +1℃/일이면 R=60. 환자 데이터에서 추정한 값이 아님.",
       "x_limit": 40,
-      "window": 7,
       "deviation_bounds": [
-        0.015,
-        0.04
-      ]
+        288,
+        1440
+      ],
+      "previous_points": 3
+    },
+    "co2": {
+      "alpha": 40,
+      "beta": 40,
+      "x_limit": 5.5,
+      "lower_is_risk": true,
+      "deviation_bounds": [
+        28.8,
+        144
+      ],
+      "weight_basis": "하루 0.5 pH의 경고 방향 변화에 20점 가산하는 일 단위 시뮬레이션 가정. HTML에는 R이 없음. 페놀레드는 하한 5.5를 기준으로 하락 방향을 사용.",
+      "previous_points": 3
     }
-  }
+  },
+  "trend_basis": "HTML 기본 D 경계(분당)에 1440을 곱한 일당 동등값. 페놀레드는 pH 기준을 차용. 일 단위 임상 판별력 미검증."
 }

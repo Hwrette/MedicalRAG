@@ -19,6 +19,7 @@ class ChatTests(unittest.TestCase):
         self.client = Mock()
         self.client.models.generate_content.return_value = SimpleNamespace(text='설명 답변')
         self.store = Mock()
+        self.store.store = {}
         self.store.similarity_search.return_value = [Document(page_content='근거 본문', metadata={'source':'source.pdf','page':2})]
         self.loader = Mock(return_value=self.store)
         self.chat = Conversation(self.client, 'test-model', 'few-shot instructions',
@@ -58,6 +59,30 @@ class ChatTests(unittest.TestCase):
         self.assertIn('FileNotFoundError', self.log.path.read_text())
         self.assertIsNotNone(self.chat.answer('다시 질문', False))
 
+    def test_rag_only_menu_and_flag_compare_without_measurements(self):
+        for args, menu in [(['--rag-only'], []), ([], ['4'])]:
+            with self.subTest(args=args):
+                self.client.reset_mock()
+                self.store.reset_mock()
+                with patch('sys.argv', ['chat.py', *args]), \
+                     patch('DressingExpert.chat.Transcript', return_value=self.log), \
+                     patch('DressingExpert.chat.run') as expert, \
+                     patch('DressingExpert.chat.collect_measurements') as collect, \
+                     patch('DressingExpert.chat.genai.Client', return_value=self.client), \
+                     patch('DressingExpert.chat.InMemoryVectorStore.load', return_value=self.store), \
+                     patch('DressingExpert.chat.GoogleGenerativeAIEmbeddings'), \
+                     patch('builtins.input', side_effect=[*menu, '/비교 질문', '/종료']):
+                    main()
+                expert.assert_not_called()
+                collect.assert_not_called()
+                self.store.similarity_search.assert_called_once_with('질문', k=3)
+                off, on = [c.kwargs for c in self.client.models.generate_content.call_args_list]
+                self.assertEqual(off['config'], on['config'])
+                self.assertNotIn('expert_output', str(on))
+                self.assertNotIn('근거 본문', str(off))
+                self.assertIn('근거 본문', str(on))
+                self.assertIn('독립 비교=True', self.log.path.read_text())
+
     def test_cli_commands_and_exit_save_input_and_result(self):
         with patch('sys.argv',['chat.py','--rag','off','--input-mode','json']), \
              patch('DressingExpert.chat.Transcript', return_value=self.log), \
@@ -74,14 +99,14 @@ class ChatTests(unittest.TestCase):
     def test_cli_manual_mode_sends_history_to_expert_and_saves_log(self):
         measurements = (
             {'ph_value': 6.8, 'temperature_value': 37.4,
-             'co2_value': 800, 'measurement_day': 3,
+             'co2_value': 6.2, 'measurement_day': 3,
              'day_since_start': 3, 'day_since_change': 3,
              'dressing_change_event': False},
             [
-                {'ph_value': 6.2, 'temperature_value': 37.0, 'co2_value': 500,
+                {'ph_value': 6.2, 'temperature_value': 37.0, 'co2_value': 5.8,
                  'measurement_day': 1, 'day_since_start': 1,
                  'day_since_change': 1, 'dressing_change_event': False},
-                {'ph_value': 6.5, 'temperature_value': 37.2, 'co2_value': 600,
+                {'ph_value': 6.5, 'temperature_value': 37.2, 'co2_value': 6.0,
                  'measurement_day': 2, 'day_since_start': 2,
                  'day_since_change': 2, 'dressing_change_event': False},
             ],
@@ -219,7 +244,7 @@ class ChatTests(unittest.TestCase):
         api_client.assert_not_called()
 
     def test_expert_failure_keeps_input_log(self):
-        value = {'ph_value': 6.8, 'temperature_value': 37.2, 'co2_value': 800,
+        value = {'ph_value': 6.8, 'temperature_value': 37.2, 'co2_value': 6.2,
                  'measurement_day': 1, 'day_since_start': 1, 'day_since_change': 1,
                  'dressing_change_event': False}
         with patch('sys.argv', ['chat.py', '--input-mode', 'manual', '--rag', 'off']), \

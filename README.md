@@ -27,7 +27,7 @@ from DressingExpert.dressingExpert import run
 result = run(raw={
     "ph_value": 6.8,
     "temperature_value": 37.2,
-    "co2_value": 800,
+    "co2_value": 6.2,
     "day_since_start": 1,
     "day_since_change": 1,
     "dressing_change_event": False,
@@ -39,7 +39,7 @@ print(result["fired_rules"])
 ```
 
 기존 `ph`, `temperature`, `co2`, `humidity` 입력을 새 이름으로 자동 변환하지 않습니다.
-페놀레드는 `co2_value`(임시 단위 ppm)를 받으며 이전 `phenol_red_ph_value` 입력은 변환하지 않습니다. 세 필수 측정값은 숫자로 전달합니다.
+BTB 패치의 pH는 `ph_value`, 페놀레드 패치의 pH는 `co2_value`로 받으며 이전 `phenol_red_ph_value` 입력은 변환하지 않습니다. 세 필수 측정값은 숫자로 전달합니다.
 
 `thresholds.csv`와 사전 등급 변환을 제거했습니다. 분류 경계는 R01~R15의 수치 조건에만 있습니다.
 `normal → observation → caution → infection_risk → high_risk`의 5단계를 사용합니다.
@@ -49,13 +49,13 @@ print(result["fired_rules"])
 사용자 제안에 따라 **36~40℃를 임시 설정**했으며, 실제 센서 사양으로 확인된 범위가 아닙니다.
 따라서 현재 설정에서는 36℃ 미만도 유효하지 않습니다. 실제 사양 확인 후 수정해야 합니다.
 이 범위를 생략하면 온도 유효성과 종합 판단을 보류하고 설정 경고를 반환합니다.
-BTB pH의 유효 범위는 0~14, CO₂ 입력은 0 이상의 유한 숫자입니다. CO₂는 센서 상한이 아직 정해지지 않았습니다.
+BTB pH의 유효 범위는 0~14, 페놀레드 패치 pH도 0~14의 유한 숫자입니다. 기존 ppm 측정값을 pH로 자동 변환하지 않습니다.
 
 ## 이력과 시간
 
 ```python
 result = run(
-    raw={"ph_value": 7.2, "temperature_value": 37.7, "co2_value": 1200},
+    raw={"ph_value": 7.2, "temperature_value": 37.7, "co2_value": 6.8},
     history_path="/tmp/my-wound-history.json",
     save_history=True,
 )
@@ -114,20 +114,17 @@ A15는 기록 및 예정된 관찰 계속이라는 행동 설명으로 표현합
 
 ## 하루 단위 알고리즘 및 임시 CO₂ 규칙
 
-`files/algorithm_config.json`에 pH/온도 계수와 D 경계를 둡니다. 분류용 CO₂ 경계는
-`rules.csv` R11~R15에만 있으며, 임시 구간은 <600, 600~1000, 1000~1500,
-1500~2500, >=2500 ppm입니다(각 하한 포함). 임상 또는 센서 검증을 거친 값이 아닙니다.
-CO₂가 낮을수록 경고 단계가 올라가며 기존 복합·지속성 규칙은 이 단계로 판단합니다.
+`files/algorithm_config.json`에 세 패치의 계수와 D 경계를 둡니다. 분류용 CO₂ 경계는
+`rules.csv` R11~R15에만 있으며, 임시 구간은 0~6, 6~6.5, 6.5~7, 7~8, 8~14입니다(각 하한 포함, 최종 상한 14 포함). 임상 또는 센서 검증을 거친 값이 아닙니다.
+페놀레드 패치 pH가 낮을수록 경고 단계가 올라가며 기존 복합·지속성 규칙은 이 단계로 판단합니다.
 
 `measurement_day`는 최초 측정일부터 센 일 단위 시점입니다. 첫날은 1, 12시간 후는 1.5,
 하루 후는 2입니다. 생략하면 `day_since_start`를 사용합니다. 둘 다 없으면 R/D는 계산하지 않습니다.
 이력은 같은 대상·상처의 오래된 순서로 전달합니다. 중복/역순 시간은 계산 보류,
 무효 측정은 연속 구간을 끊습니다. R은 최소 2회, D 분류는 최소 3회 측정이 필요합니다.
 
-- pH R: alpha=40, beta=500, limit=8.5 (제공한 예시).
-- 온도 R: alpha=10, beta=20, limit=40 (동작 확인용 임시값).
-- 회귀: 최근 연속 유효 측정 최대 7회. D는 최근 기울기에서 회귀 기울기를 뺀 값.
-- D 경계: pH ±0.018/±0.03, 온도 ±0.015/±0.04 (단위 pH/일, ℃/일).
+- 일 단위 R 계수: 세 패치 모두 α=40, β=40. BTB 상한 8.5, 온도 상한 40, 페놀레드 하한 5.5. 페놀레드는 하락 기울기에 가점합니다. 하루 0.5단위의 경고 방향 변화가 20점이 되도록 정한 연구용 척도입니다. HTML에는 R이 없습니다.
+- D는 마지막 두 점의 일당 기울기에서 현재점을 제외한 이전 최대 3점의 회귀 기울기를 뺍니다. HTML 기본 경계를 물리적으로 동일하게 환산하면 BTB·페놀레드는 ±28.8/±144 pH/일, 온도는 ±288/±1440 ℃/일입니다. 일별 측정에 적합한 임상 기준으로 검증되지 않았습니다.
 - R 구간: <20부터 20 간격으로 `band_0`~`band_4`. >=100은 `out_of_scale`.
 - X>=limit이면 R을 계산하지 않고 `limit_exceeded`. 감염 확진 표현은 사용하지 않습니다.
 - Q01: R>=60 또는 상한 도달/초과 시 `numeric_score_review`와 재확인 행동.
