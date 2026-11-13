@@ -8,7 +8,7 @@ from DressingExpert.inference import assess, LEVELS, expression_value
 from DressingExpert.dressingExpert import FILES_DIR, load_rules, run
 
 RULES = load_rules(FILES_DIR / 'rules.csv')
-VALUES = [(5.5, 6.2, 6.8, 7.5, 8.5), (36, 36.7, 37.2, 37.7, 38.5), (400, 800, 1200, 1800, 3000)]
+VALUES = [(5.5, 6.2, 6.8, 7.5, 8.5), (36, 36.7, 37.2, 37.7, 38.5), (3000, 1800, 1200, 800, 400)]
 KEYS = ['ph_value', 'temperature_value', 'co2_value']
 
 
@@ -23,7 +23,8 @@ def evaluate(data=None, history=None):
 class InferenceTests(unittest.TestCase):
     def test_current_demo(self):
         result = run()
-        self.assertEqual(result['final_assessment'], 'combined_signal_pattern')
+        self.assertEqual(result['indicator_levels']['co2_level'], 'infection_risk')
+        self.assertEqual(result['final_assessment'], 'strong_combined_signal_pattern')
         self.assertIn('review_dressing', result['actions'])
         self.assertNotIn('change_dressing', result['actions'])
 
@@ -53,7 +54,7 @@ class InferenceTests(unittest.TestCase):
     def test_exact_boundaries(self):
         cases = [('ph_value', 'ph_level', [(0,0),(6,1),(6.5,2),(7,3),(8,4),(14,4)]),
                  ('temperature_value', 'temperature_level', [(36,0),(36.5,0),(37,2),(37.5,3),(38,4),(40,4)]),
-                 ('co2_value', 'co2_level', [(0,0),(600,1),(1000,2),(1500,3),(2500,4)])]
+                 ('co2_value', 'co2_level', [(0,4),(600,3),(1000,2),(1500,1),(2500,0)])]
         for field, output, cases in cases:
             for value, level in cases:
                 with self.subTest(field=field, value=value):
